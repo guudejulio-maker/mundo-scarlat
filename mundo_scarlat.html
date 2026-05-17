@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#12071f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Mundo Scarlat 💎</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --gold:#C9973A;--gold-l:#EFC96A;--gold-d:#8A6420;
+  --rose:#B84870;--rose-l:#D9729A;--rose-d:#7A2048;
+  --bg:#12071f;--bg2:#1e1030;--bg3:#2a1848;
+  --glass:rgba(255,255,255,0.05);
+  --glass2:rgba(255,255,255,0.09);
+  --border:rgba(201,151,58,0.18);
+  --border2:rgba(201,151,58,0.35);
+  --txt:#f0e6ff;--txt2:#c0a0d8;--txt3:#8060a8;
+  --r:14px;--r2:20px;--r3:28px;
+  --sg:0 0 24px rgba(201,151,58,.25);
+  --sr:0 0 20px rgba(184,72,112,.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);
+  min-height:100%;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 100% 50% at 50% 0%,#3a1060 0%,transparent 65%),
+    radial-gradient(circle at 10% 80%,#20083a 0%,transparent 40%),
+    radial-gradient(circle at 90% 20%,#180630 0%,transparent 40%);
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 8% 18%,rgba(255,255,200,.65),transparent),
+    radial-gradient(1.5px 1.5px at 22% 58%,rgba(255,200,255,.45),transparent),
+    radial-gradient(1px 1px at 38% 8%,rgba(255,255,255,.7),transparent),
+    radial-gradient(1px 1px at 52% 82%,rgba(200,255,255,.55),transparent),
+    radial-gradient(1.5px 1.5px at 67% 24%,rgba(255,240,200,.6),transparent),
+    radial-gradient(1px 1px at 78% 52%,rgba(255,255,255,.45),transparent),
+    radial-gradient(1px 1px at 91% 14%,rgba(255,200,200,.55),transparent),
+    radial-gradient(1px 1px at 4% 73%,rgba(200,200,255,.45),transparent),
+    radial-gradient(1.2px 1.2px at 33% 42%,rgba(255,255,255,.35),transparent),
+    radial-gradient(1.5px 1.5px at 62% 68%,rgba(255,220,200,.5),transparent);
+}
+#app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100vh}
+.screen{display:none;padding:20px 16px 96px;min-height:100vh;animation:fadeIn .25s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* LOADING */
+#loading{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease}
+#loading.gone{opacity:0;pointer-events:none}
+.ld-gem{font-size:56px;animation:gf 1.8s ease-in-out infinite}
+.ld-t{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;margin:10px 0 2px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ld-s{font-size:11px;letter-spacing:2px;color:var(--txt3);text-transform:uppercase;margin-bottom:28px}
+.ld-bar{width:110px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.ld-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--gold));animation:ldf 1.8s ease-out forwards}
+@keyframes ldf{to{width:100%}}
+@keyframes gf{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+/* AUTH */
+#screen-auth{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;min-height:100vh}
+.brand{text-align:center;margin-bottom:36px}
+.brand-gem{font-size:60px;display:block;filter:drop-shadow(0 0 18px rgba(201,151,58,.5));animation:gf 3s ease-in-out infinite}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;letter-spacing:5px;text-transform:uppercase;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-top:4px}
+.brand-tag{font-size:11px;letter-spacing:3px;color:var(--txt3);text-transform:uppercase;margin-top:6px}
+.auth-box{width:100%;background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);padding:28px 22px;backdrop-filter:blur(24px)}
+.tabs{display:flex;background:rgba(0,0,0,.25);border-radius:var(--r);padding:4px;margin-bottom:22px}
+.tab{flex:1;padding:10px;border:none;background:transparent;color:var(--txt2);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;border-radius:10px;transition:all .2s}
+.tab.on{background:linear-gradient(135deg,var(--rose),var(--rose-d));color:#fff;box-shadow:var(--sr)}
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--txt3);margin-bottom:6px}
+.inp{width:100%;padding:13px 15px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-family:'Nunito',sans-serif;font-size:15px;transition:border-color .2s;-webkit-appearance:none}
+.inp:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.07)}
+.inp::placeholder{color:rgba(255,255,255,.2)}
+.btn-gold{width:100%;padding:15px;border:none;border-radius:var(--r);cursor:pointer;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#1a0830;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;transition:all .2s;box-shadow:var(--sg)}
+.btn-gold:hover{transform:translateY(-1px)}
+.btn-gold:active{transform:none}
+.btn-gold:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.msg{margin-top:12px;padding:11px 14px;border-radius:var(--r);font-size:13px;font-weight:600;display:none}
+.msg.err{background:rgba(184,72,112,.15);border:1px solid rgba(184,72,112,.35);color:#ffaac8;display:block}
+.msg.ok{background:rgba(201,151,58,.12);border:1px solid rgba(201,151,58,.3);color:var(--gold-l);display:block}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
+.ava{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--bg3));border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex-shrink:0}
+.uinfo{flex:1;margin-left:10px}
+.uname{font-size:14px;font-weight:800;line-height:1.2}
+.usub{font-size:11px;color:var(--txt2)}
+.btn-out{background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:7px 13px;color:var(--txt2);font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
+
+/* SEASON HEADER */
+.shdr{text-align:center;padding:6px 0 18px}
+.sbadge{display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;margin-bottom:8px}
+.stitle{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;background:linear-gradient(135deg,var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.2}
+.sprog{display:flex;justify-content:center;align-items:center;gap:5px;margin-top:6px;font-size:13px;color:var(--txt2)}
+.sprog strong{color:var(--gold-l);font-weight:900}
+
+/* BOARD */
+.board-wrap{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:18px 12px;margin-bottom:18px;position:relative;overflow:hidden}
+.board-wrap::before{content:'';position:absolute;inset:-1px;border-radius:var(--r2);background:linear-gradient(135deg,rgba(201,151,58,.12),transparent 45%,rgba(184,72,112,.08));pointer-events:none}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.house{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);min-height:52px}
+.house .hn{font-size:10px;font-weight:800;color:rgba(255,255,255,.25);line-height:1}
+.house .hi{font-size:19px;line-height:1;margin-bottom:1px}
+.house.prize-house{background:rgba(201,151,58,.09);border-color:rgba(201,151,58,.28)}
+.house.prize-house .hn{color:var(--gold)}
+.house.passed{background:rgba(201,151,58,.06);border-color:rgba(201,151,58,.18)}
+.house.won-house{background:linear-gradient(135deg,rgba(201,151,58,.22),rgba(160,120,48,.12));border-color:rgba(201,151,58,.45)}
+.house.current-house{background:linear-gradient(135deg,rgba(184,72,112,.3),rgba(122,32,72,.2));border:2px solid var(--rose-l);box-shadow:0 0 18px rgba(184,72,112,.45);transform:scale(1.07);z-index:2}
+.house.current-house .hn{color:#fff}
+.token{font-size:22px;animation:bounce 1.2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes flashH{0%{transform:scale(1)}40%{transform:scale(1.18);box-shadow:0 0 22px rgba(201,151,58,.65)}100%{transform:scale(1)}}
+.house.flash{animation:flashH .45s ease-out forwards}
+
+/* PRIZE STRIP */
+.strip-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.strip-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.strip{display:flex;gap:7px;overflow-x:auto;padding:3px;scrollbar-width:none;margin-bottom:18px}
+.strip::-webkit-scrollbar{display:none}
+.pcard{flex:0 0 84px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:11px 6px;text-align:center}
+.pcard.next-p{border-color:var(--gold);background:rgba(201,151,58,.09);box-shadow:var(--sg)}
+.pcard.won-p{border-color:rgba(184,72,112,.35);background:rgba(184,72,112,.07)}
+.pcard .pi{font-size:22px;margin-bottom:3px}
+.pcard .ph{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--txt3);margin-bottom:2px}
+.pcard .pn{font-size:10px;font-weight:700;line-height:1.2;color:var(--gold-l)}
+.pcard.won-p .pn{color:var(--rose-l)}
+
+/* CODE INPUT */
+.code-box{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:18px}
+.sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.code-row{display:flex;gap:8px}
+.code-inp{flex:1;padding:14px;background:rgba(0,0,0,.28);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-family:'Nunito',sans-serif;font-size:19px;font-weight:900;letter-spacing:5px;text-transform:uppercase;text-align:center;-webkit-appearance:none}
+.code-inp:focus{outline:none;border-color:var(--gold)}
+.code-inp::placeholder{font-size:12px;letter-spacing:2px;font-weight:400}
+.btn-rose{padding:14px 18px;border:none;border-radius:var(--r);cursor:pointer;background:linear-gradient(135deg,var(--rose-l),var(--rose),var(--rose-d));color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;box-shadow:var(--sr);transition:all .2s;white-space:nowrap}
+.btn-rose:hover{transform:translateY(-1px)}
+.btn-rose:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.cfb{margin-top:11px;padding:11px 13px;border-radius:var(--r);font-size:13px;font-weight:600;display:none}
+.cfb.err{background:rgba(184,72,112,.14);border:1px solid rgba(184,72,112,.3);color:#ffaac8;display:block}
+.cfb.ok{background:rgba(201,151,58,.12);border:1px solid rgba(201,151,58,.28);color:var(--gold-l);display:block}
+
+/* HISTORY */
+.hitem{display:flex;align-items:center;gap:11px;padding:12px 13px;background:var(--glass);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);margin-bottom:8px}
+.hicon{font-size:20px;flex-shrink:0}
+.hinfo{flex:1}
+.htitle{font-size:13px;font-weight:700}
+.hsub{font-size:11px;color:var(--txt2);margin-top:2px}
+.hbadge{font-size:12px;font-weight:900;color:var(--gold);background:rgba(201,151,58,.1);border-radius:7px;padding:3px 8px}
+
+/* ADMIN */
+.admin-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:14px}
+.admin-card h3{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:16px}
+.btn-sm{padding:11px 16px;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--gold-l),var(--gold-d));color:#1a0830;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer}
+.code-disp{display:none;margin-top:14px;padding:18px;text-align:center;background:rgba(0,0,0,.3);border:1px solid var(--gold);border-radius:var(--r)}
+.code-disp .cv{font-size:26px;font-weight:900;letter-spacing:7px;color:var(--gold-l);font-family:'Nunito',sans-serif}
+.code-disp .ch{font-size:11px;color:var(--txt2);margin-top:6px}
+.ctable{width:100%;border-collapse:collapse;font-size:13px}
+.ctable th{text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt2);padding:7px 3px;border-bottom:1px solid rgba(255,255,255,.08)}
+.ctable td{padding:10px 3px;border-bottom:1px solid rgba(255,255,255,.04)}
+.hb2{display:inline-block;background:rgba(201,151,58,.14);border:1px solid rgba(201,151,58,.28);border-radius:7px;padding:2px 8px;font-size:12px;font-weight:900;color:var(--gold)}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:none;background:rgba(18,7,31,.96);border-top:1px solid var(--border);backdrop-filter:blur(24px);z-index:100;padding:6px 0 max(6px,env(safe-area-inset-bottom))}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;background:none;border:none;color:var(--txt2);font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer;transition:color .2s}
+.nbtn.on{color:var(--gold)}
+.nbtn span:first-child{font-size:21px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:all}
+.mcard{width:100%;max-width:400px;background:linear-gradient(155deg,var(--bg3),var(--bg));border:1px solid var(--border2);border-radius:var(--r3);padding:30px 22px;text-align:center;transform:translateY(36px);transition:transform .3s}
+.overlay.open .mcard{transform:translateY(0)}
+.mgem{font-size:68px;display:block;margin-bottom:14px;animation:gf 2s ease-in-out infinite}
+.mtitle{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--gold-l);margin-bottom:6px}
+.msub{font-size:14px;color:var(--txt2);margin-bottom:22px}
+.prev{background:rgba(201,151,58,.1);border:1px solid rgba(201,151,58,.22);border-radius:var(--r2);padding:18px;margin-bottom:8px}
+.prev-icon{font-size:46px;display:block;margin-bottom:8px}
+.prev-house{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);margin-bottom:4px}
+.prev-name{font-size:20px;font-weight:900;color:var(--gold);font-family:'Cormorant Garamond',serif;margin-bottom:4px}
+.prev-desc{font-size:13px;color:var(--txt2)}
+.btn-close{width:100%;margin-top:16px;padding:15px;border:none;border-radius:var(--r);cursor:pointer;background:linear-gradient(135deg,var(--gold-l),var(--gold));color:#1a0830;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900}
+.cf{position:fixed;pointer-events:none;z-index:250;font-size:22px;animation:cff var(--d,2s) ease-in forwards}
+@keyframes cff{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+.empty{text-align:center;padding:30px 12px;color:var(--txt2)}
+.empty .ei{font-size:38px;margin-bottom:10px}
+.empty p{font-size:13px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold);text-align:center;padding:14px 0 22px}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <span class="ld-gem">💎</span>
+  <div class="ld-t">Scarlat</div>
+  <div class="ld-s">Mundo de Prêmios</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+</div>
+
+<div id="app">
+
+<!-- AUTH -->
+<div id="screen-auth" class="screen active" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+  <div class="brand">
+    <span class="brand-gem">💎</span>
+    <div class="brand-name">Scarlat</div>
+    <div class="brand-tag">Mundo de Prêmios Exclusivos</div>
+  </div>
+  <div class="auth-box">
+    <div class="tabs">
+      <button class="tab on" onclick="setTab('login')">Entrar</button>
+      <button class="tab" onclick="setTab('reg')">Cadastrar</button>
+    </div>
+    <div id="t-login">
+      <div class="fg"><label>E-mail</label>
+        <input class="inp" id="l-email" type="email" placeholder="seu@email.com" autocomplete="email"></div>
+      <div class="fg"><label>Senha</label>
+        <input class="inp" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn-gold" id="b-login" onclick="doLogin()">✨ Entrar no Mundo Scarlat</button>
+      <div class="msg" id="m-login"></div>
+    </div>
+    <div id="t-reg" style="display:none">
+      <div class="fg"><label>Seu nome</label>
+        <input class="inp" id="r-name" type="text" placeholder="Nome completo"></div>
+      <div class="fg"><label>E-mail</label>
+        <input class="inp" id="r-email" type="email" placeholder="seu@email.com" autocomplete="email"></div>
+      <div class="fg"><label>Senha</label>
+        <input class="inp" id="r-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+      <button class="btn-gold" id="b-reg" onclick="doReg()">🌟 Criar minha conta</button>
+      <div class="msg" id="m-reg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+  <div class="topbar">
+    <div class="ava" id="ava">S</div>
+    <div class="uinfo">
+      <div class="uname" id="uname">Carregando…</div>
+      <div class="usub">Jogadora Scarlat 💎</div>
+    </div>
+    <button class="btn-out" onclick="doOut()">Sair</button>
+  </div>
+  <div class="shdr">
+    <div class="sbadge" id="sbadge">✨ Temporada</div>
+    <div class="stitle" id="stitle">Carregando…</div>
+    <div class="sprog">Casa <strong id="cur-h">0</strong> de <strong id="tot-h">20</strong></div>
+  </div>
+  <div class="board-wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="strip-label">🎁 Prêmios do Tabuleiro</div>
+  <div class="strip" id="strip"></div>
+  <div class="code-box">
+    <div class="sec-label">🛍️ Inserir Código de Compra</div>
+    <div class="code-row">
+      <input class="code-inp" id="code-inp" type="text" placeholder="CÓDIGO" maxlength="14" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="btn-rose" id="b-use" onclick="doUse()">Usar</button>
+    </div>
+    <div class="cfb" id="cfb"></div>
+  </div>
+</div>
+
+<!-- HISTÓRICO -->
+<div id="screen-hist" class="screen">
+  <div class="page-title">Minha Jornada</div>
+  <div class="sec-label">🏆 Prêmios Conquistados</div>
+  <div id="pr-list" style="margin-top:10px"></div>
+  <div class="sec-label" style="margin-top:20px">📋 Histórico de Compras</div>
+  <div id="mv-list" style="margin-top:10px"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="screen-admin" class="screen">
+  <div class="page-title">⚙️ Painel Admin</div>
+  <div class="admin-card">
+    <h3>🔑 Gerar Código de Compra</h3>
+    <div class="fg"><label>Código (você define — ex: ROSA25)</label>
+      <input class="inp" id="a-code" type="text" placeholder="Mín. 6 caracteres" style="text-transform:uppercase;letter-spacing:3px;font-weight:900;font-size:16px"></div>
+    <div style="display:flex;gap:8px">
+      <div class="fg" style="flex:1;margin-bottom:0"><label>Casas</label>
+        <input class="inp" id="a-houses" type="number" min="1" max="20" value="2"></div>
+      <div class="fg" style="flex:1;margin-bottom:0"><label>Valor R$</label>
+        <input class="inp" id="a-val" type="number" placeholder="0"></div>
+    </div>
+    <div class="fg" style="margin-top:12px"><label>Descrição interna</label>
+      <input class="inp" id="a-desc" type="text" placeholder="ex: Anéis — Maria Silva"></div>
+    <button class="btn-sm" style="width:100%;padding:14px;margin-top:4px" onclick="adminCreate()">✨ Criar Código</button>
+    <div class="code-disp" id="code-disp">
+      <div class="cv" id="code-disp-val"></div>
+      <div class="ch">📲 Envie este código para a cliente via WhatsApp</div>
+    </div>
+    <div class="msg" id="a-msg" style="margin-top:10px"></div>
+  </div>
+  <div class="admin-card">
+    <h3>👑 Clientes no Tabuleiro</h3>
+    <div id="a-clients"></div>
+  </div>
+  <div class="admin-card">
+    <h3>📦 Prêmios para Entregar</h3>
+    <div id="a-pending"></div>
+  </div>
+  <div class="admin-card">
+    <h3>🔍 Últimas Atividades (Audit Log)</h3>
+    <div id="a-audit"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div style="display:flex;width:100%">
+    <button class="nbtn on" id="nb-game" onclick="goScreen('game')"><span>🏠</span><span>Tabuleiro</span></button>
+    <button class="nbtn" id="nb-hist" onclick="goScreen('hist')"><span>📋</span><span>Histórico</span></button>
+    <button class="nbtn" id="nb-admin" onclick="goScreen('admin')" style="display:none"><span>⚙️</span><span>Admin</span></button>
+  </div>
+</nav>
+
+<!-- MODAL -->
+<div class="overlay" id="modal">
+  <div class="mcard">
+    <span class="mgem">🎉</span>
+    <div class="mtitle">Você ganhou!</div>
+    <div class="msub" id="m-sub">Parabéns!</div>
+    <div id="m-prizes"></div>
+    <button class="btn-close" onclick="closeModal()">🌟 Incrível! Fechar</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// SUPABASE — Projeto exclusivo Mundo Scarlat Joias
+// ID: hyuqruwpcevwhwqmptbe  |  Região: sa-east-1
+// ZERO compartilhamento com outros projetos Scarlat
+// ═══════════════════════════════════════════════════
+const SB_URL = 'https://hyuqruwpcevwhwqmptbe.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5dXFydXdwY2V2d2h3cW1wdGJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDc2MDEsImV4cCI6MjA5NDYyMzYwMX0.RnvjjBR5Q7-Hychh-znxylXXLplG3xxartOktpT1XHE';
+const db = supabase.createClient(SB_URL, SB_KEY);
+
+// STATE
+let USER=null, PROF=null, SEASON=null, PRIZES=[], MOVES=[], CLAIMS=[];
+const ICONS={surprise:'🎁',key:'🔑',chest:'💎',crown:'👑',bonus:'⭐',trip:'✈️',empty:'·'};
+const EV_ICONS={'code_used_success':'✅','code_invalid':'❌','code_already_used':'⚠️','rate_limit_hit':'🚫','code_created':'🔑','prize_delivered':'📦','role_changed':'👤','code_expired':'⏰','code_wrong_owner':'🔒','code_error':'💥'};
+
+// BOOT
+addEventListener('DOMContentLoaded', async () => {
+  try {
+    const { data:{session} } = await db.auth.getSession();
+    if (session?.user) await boot(session.user);
+  } catch(e){console.warn(e)}
+  setTimeout(()=>el('loading').classList.add('gone'), 1800);
+  db.auth.onAuthStateChange(async(ev,s)=>{
+    if(ev==='SIGNED_IN'&&s) await boot(s.user);
+    if(ev==='SIGNED_OUT') showAuth();
+  });
+});
+
+async function boot(user) {
+  USER=user;
+  const {data}=await db.from('profiles').select('*').eq('id',user.id).single();
+  PROF=data;
+  await loadAll();
+  showGame();
+}
+async function loadAll() {
+  await loadSeason(); await loadMoves(); await loadClaims();
+}
+async function loadSeason() {
+  const {data:s}=await db.from('seasons').select('*').eq('is_active',true).single();
+  SEASON=s;
+  if(SEASON){const {data:p}=await db.from('house_prizes').select('*').eq('season_id',SEASON.id).order('house_number');PRIZES=p||[];}
+}
+async function loadMoves(){
+  if(!USER||!SEASON)return;
+  const {data}=await db.from('board_moves').select('*').eq('client_id',USER.id).eq('season_id',SEASON.id).order('moved_at',{ascending:false}).limit(30);
+  MOVES=data||[];
+}
+async function loadClaims(){
+  if(!USER||!SEASON)return;
+  const {data}=await db.from('prize_claims').select('*,house_prizes(*)').eq('client_id',USER.id).eq('season_id',SEASON.id).order('claimed_at',{ascending:false});
+  CLAIMS=data||[];
+}
+
+// AUTH
+function setTab(t){
+  ['login','reg'].forEach(x=>el('t-'+x).style.display=x===t?'block':'none');
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',(i===0&&t==='login')||(i===1&&t==='reg')));
+}
+async function doLogin(){
+  const e=v('l-email'),p=v('l-pass'),btn=el('b-login'),m=el('m-login');
+  if(!e||!p){setMsg(m,'Preencha e-mail e senha.','err');return;}
+  btn.disabled=true;btn.textContent='Entrando…';
+  const {error}=await db.auth.signInWithPassword({email:e,password:p});
+  if(error)setMsg(m,error.message.includes('Invalid')?'E-mail ou senha incorretos.':error.message,'err');
+  btn.disabled=false;btn.textContent='✨ Entrar no Mundo Scarlat';
+}
+async function doReg(){
+  const n=v('r-name'),e=v('r-email'),p=v('r-pass'),btn=el('b-reg'),m=el('m-reg');
+  if(!n||!e||!p){setMsg(m,'Preencha todos os campos.','err');return;}
+  if(p.length<6){setMsg(m,'Senha: mínimo 6 caracteres.','err');return;}
+  btn.disabled=true;btn.textContent='Criando…';
+  const {error}=await db.auth.signUp({email:e,password:p,options:{data:{full_name:n}}});
+  if(error)setMsg(m,error.message,'err');
+  else setMsg(m,'✅ Conta criada! Verifique seu e-mail para confirmar.','ok');
+  btn.disabled=false;btn.textContent='🌟 Criar minha conta';
+}
+async function doOut(){await db.auth.signOut();}
+
+// SCREENS
+function showAuth(){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  const sa=el('screen-auth');sa.style.display='flex';sa.classList.add('active');
+  el('nav').style.display='none';USER=null;PROF=null;
+}
+function showGame(){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  el('nav').style.display='block';
+  if(PROF?.role==='admin')el('nb-admin').style.display='flex';
+  goScreen('game');
+}
+function goScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
+  const s=el('screen-'+name);s.style.display='block';s.classList.add('active');
+  const nb=el('nb-'+name);if(nb)nb.classList.add('on');
+  if(name==='game')renderGame();
+  if(name==='hist')renderHist();
+  if(name==='admin')renderAdmin();
+}
+
+// RENDER GAME
+function renderGame(){
+  if(!SEASON){el('grid').innerHTML='<div class="empty" style="grid-column:span 5"><div class="ei">🌙</div><p>Nenhuma temporada ativa.</p></div>';return;}
+  const cur=PROF?.current_house||0,tot=SEASON.total_houses;
+  el('sbadge').textContent='✨ Temporada Ativa';
+  el('stitle').textContent=SEASON.name;
+  el('cur-h').textContent=cur;el('tot-h').textContent=tot;
+  const name=PROF?.full_name||USER?.email||'?';
+  el('uname').textContent=name.split(' ')[0];
+  el('ava').textContent=name[0]?.toUpperCase()||'?';
+  // Grid
+  const g=el('grid');g.innerHTML='';
+  for(let i=1;i<=tot;i++){
+    const prize=PRIZES.find(p=>p.house_number===i);
+    const isCur=i===cur,isPast=i<cur,isWon=CLAIMS.some(c=>c.house_number===i);
+    const d=document.createElement('div');
+    d.className='house'+(prize?' prize-house':'')+(isCur?' current-house':isPast?' passed':'')+(isWon&&prize?' won-house':'');
+    if(isCur) d.innerHTML=`<div class="token">👸</div><div class="hn">${i}</div>`;
+    else if(prize) d.innerHTML=`<div class="hi">${ICONS[prize.prize_type]||'🎁'}</div><div class="hn">${i}</div>`;
+    else d.innerHTML=`<div class="hn">${i}</div>`;
+    g.appendChild(d);
+  }
+  // Strip
+  const strip=el('strip');strip.innerHTML='';
+  if(!PRIZES.length){strip.innerHTML='<p style="font-size:12px;color:var(--txt2)">Nenhum prêmio configurado.</p>';return;}
+  PRIZES.forEach(p=>{
+    const isWon=CLAIMS.some(c=>c.house_number===p.house_number);
+    const isAhead=p.house_number>cur;
+    const isNext=isAhead&&!PRIZES.find(pp=>!CLAIMS.some(c=>c.house_number===pp.house_number)&&pp.house_number>cur&&pp.house_number<p.house_number);
+    const card=document.createElement('div');
+    card.className='pcard'+(isNext&&!isWon?' next-p':'')+(isWon?' won-p':'');
+    card.innerHTML=`<div class="pi">${isWon?'✅':ICONS[p.prize_type]||'🎁'}</div><div class="ph">Casa ${p.house_number}</div><div class="pn">${p.prize_name}</div>`;
+    strip.appendChild(card);
+  });
+}
+
+// USAR CÓDIGO
+async function doUse(){
+  const code=v('code-inp').toUpperCase().trim();
+  const fb=el('cfb'),btn=el('b-use');
+  if(!code){setFb('Insira um código.','err');return;}
+  btn.disabled=true;btn.textContent='…';fb.className='cfb';
+  try {
+    // Toda a validação + hash SHA-256 + rate limiting acontece no SERVIDOR
+    // O front-end só envia o texto — nunca tem acesso ao banco diretamente
+    const {data,error}=await db.rpc('use_purchase_code',{p_code:code});
+    if(error)throw error;
+    if(!data.success){
+      setFb(data.error,'err');
+    } else {
+      el('code-inp').value='';
+      setFb(`✨ Avançou ${data.houses_advanced} ${data.houses_advanced===1?'casa':'casas'}! Casa ${data.from_house} → ${data.to_house}`,'ok');
+      if(PROF)PROF.current_house=data.to_house;
+      await loadMoves();await loadClaims();
+      animateAdv(data.from_house,data.to_house);
+      setTimeout(()=>{
+        renderGame();
+        if(data.prizes?.length)setTimeout(()=>showModal(data.prizes),600);
+        else if(data.finished)setTimeout(()=>showFinished(),600);
+      },900);
+    }
+  }catch(e){setFb('Erro de conexão. Tente novamente.','err');console.error(e);}
+  btn.disabled=false;btn.textContent='Usar';
+}
+function animateAdv(from,to){
+  const houses=el('grid').querySelectorAll('.house');
+  for(let i=from+1,d=0;i<=to;i++,d+=200){
+    const h=houses[i-1];if(!h)continue;
+    setTimeout(()=>{h.classList.add('flash');setTimeout(()=>h.classList.remove('flash'),450);},d);
+  }
+}
+
+// MODAL
+function showModal(prizes){
+  el('m-sub').textContent=prizes.length===1?`Você chegou à casa ${prizes[0].house} e conquistou:`:`Você conquistou ${prizes.length} prêmios!`;
+  el('m-prizes').innerHTML=prizes.map(p=>`
+    <div class="prev"><span class="prev-icon">${ICONS[p.prize_type]||'🎁'}</span>
+    <div class="prev-house">Casa ${p.house}</div>
+    <div class="prev-name">${p.prize_name}</div>
+    <div class="prev-desc">${p.prize_description||'A equipe Scarlat entrará em contato!'}</div></div>
+  `).join('');
+  el('modal').classList.add('open');confetti();
+}
+function showFinished(){
+  el('m-sub').textContent='Você completou o tabuleiro! 🎊 A equipe Scarlat vai entrar em contato com seu grande prêmio!';
+  el('m-prizes').innerHTML='<div class="prev"><span class="prev-icon">👑</span><div class="prev-name">Tabuleiro Completo!</div></div>';
+  el('modal').classList.add('open');confetti();
+}
+function closeModal(){el('modal').classList.remove('open');}
+function confetti(){
+  const ems=['✨','💎','👑','🌸','💖','⭐','🎀','💫','🌟','🎊'];
+  for(let i=0;i<16;i++)setTimeout(()=>{
+    const c=document.createElement('div');
+    c.className='cf';c.textContent=ems[Math.floor(Math.random()*ems.length)];
+    c.style.cssText=`left:${Math.random()*100}vw;top:-28px;--d:${1.4+Math.random()*1.2}s`;
+    document.body.appendChild(c);setTimeout(()=>c.remove(),3500);
+  },i*90);
+}
+
+// HISTÓRICO
+async function renderHist(){
+  await loadClaims();await loadMoves();
+  const pl=el('pr-list');
+  pl.innerHTML=CLAIMS.length?CLAIMS.map(c=>{
+    const p=c.house_prizes,date=fmt(c.claimed_at);
+    const status=c.delivered
+      ?'<span style="font-size:10px;background:rgba(201,151,58,.1);color:var(--gold);padding:2px 7px;border-radius:6px">✅ Entregue</span>'
+      :'<span style="font-size:10px;background:rgba(184,72,112,.1);color:var(--rose-l);padding:2px 7px;border-radius:6px">⏳ Aguardando</span>';
+    return `<div class="hitem"><div class="hicon">${ICONS[p?.prize_type]||'🎁'}</div>
+      <div class="hinfo"><div class="htitle">${p?.prize_name||'Prêmio'}</div>
+      <div class="hsub">Casa ${c.house_number} · ${date} · ${status}</div></div></div>`;
+  }).join(''):'<div class="empty"><div class="ei">🎁</div><p>Nenhum prêmio conquistado ainda.<br>Use um código para avançar!</p></div>';
+
+  const ml=el('mv-list');
+  ml.innerHTML=MOVES.length?MOVES.map(m=>`
+    <div class="hitem"><div class="hicon">🛍️</div>
+    <div class="hinfo"><div class="htitle">Casa ${m.from_house} → ${m.to_house}</div>
+    <div class="hsub">${fmt(m.moved_at)}</div></div>
+    <div class="hbadge">+${m.to_house-m.from_house}</div></div>`).join('')
+    :'<div class="empty"><div class="ei">🛍️</div><p>Nenhuma compra registrada ainda.</p></div>';
+}
+
+// ADMIN
+async function adminCreate(){
+  const code=v('a-code').toUpperCase().trim();
+  const houses=parseInt(v('a-houses'))||1;
+  const val=parseFloat(v('a-val'))||null;
+  const desc=v('a-desc').trim()||null;
+  const m=el('a-msg');
+  if(code.length<6){setMsg(m,'Código precisa ter pelo menos 6 caracteres.','err');return;}
+
+  // A função admin_create_code verifica role admin INTERNAMENTE no banco
+  // Impossível burlar pelo front-end
+  const {data,error}=await db.rpc('admin_create_code',{
+    p_plain_code:code,p_houses_to_advance:houses,
+    p_purchase_value:val,p_purchase_description:desc
+  });
+  if(error||!data?.success){
+    setMsg(m,data?.error||error?.message||'Erro ao criar código.','err');
+  } else {
+    el('code-disp').style.display='block';
+    el('code-disp-val').textContent=code;
+    m.style.display='none';
+    el('a-code').value='';el('a-desc').value='';
+  }
+}
+async function renderAdmin(){
+  const {data:clients}=await db.from('profiles').select('*').eq('role','client').order('current_house',{ascending:false});
+  el('a-clients').innerHTML=clients?.length?`
+    <table class="ctable">
+      <thead><tr><th>Nome</th><th>Casa</th><th>Total R$</th></tr></thead>
+      <tbody>${clients.map(c=>`
+        <tr><td>${c.full_name||c.id.slice(0,8)}</td>
+        <td><span class="hb2">${c.current_house||0}</span></td>
+        <td style="font-size:12px;color:var(--txt2)">${(c.total_purchases_value||0).toFixed(0)}</td></tr>
+      `).join('')}</tbody></table>`
+    :'<p style="font-size:13px;color:var(--txt2)">Nenhuma cliente cadastrada ainda.</p>';
+
+  const {data:pend}=await db.from('prize_claims').select('*,profiles(full_name),house_prizes(prize_name,prize_type)').eq('delivered',false).order('claimed_at');
+  el('a-pending').innerHTML=pend?.length?pend.map(p=>`
+    <div class="hitem"><div class="hicon">${ICONS[p.house_prizes?.prize_type]||'🎁'}</div>
+    <div class="hinfo"><div class="htitle">${p.house_prizes?.prize_name||'Prêmio'}</div>
+    <div class="hsub">${p.profiles?.full_name||'Cliente'} · Casa ${p.house_number} · ${fmt(p.claimed_at)}</div></div>
+    <button onclick="deliver('${p.id}')" style="background:rgba(201,151,58,.14);border:1px solid rgba(201,151,58,.3);border-radius:8px;padding:6px 10px;color:var(--gold);font-size:11px;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif;white-space:nowrap">✅ Entregar</button>
+    </div>`).join(''):'<p style="font-size:13px;color:var(--txt2)">✅ Nenhum prêmio pendente.</p>';
+
+  const {data:audit}=await db.from('audit_log').select('*').order('created_at',{ascending:false}).limit(20);
+  el('a-audit').innerHTML=audit?.length?audit.map(a=>`
+    <div class="hitem" style="padding:8px 10px">
+    <div class="hicon" style="font-size:16px">${EV_ICONS[a.event_type]||'📋'}</div>
+    <div class="hinfo"><div class="htitle" style="font-size:12px">${a.event_type.replace(/_/g,' ')}</div>
+    <div class="hsub">${fmt(a.created_at)}</div></div></div>`).join('')
+    :'<p style="font-size:13px;color:var(--txt2)">Nenhuma atividade ainda.</p>';
+}
+async function deliver(id){
+  const {data,error}=await db.rpc('admin_deliver_prize',{p_claim_id:id});
+  if(error||!data?.success)alert(data?.error||'Erro ao marcar entrega.');
+  else renderAdmin();
+}
+
+// UTILS
+const el=id=>document.getElementById(id);
+const v=id=>el(id)?.value?.trim()||'';
+const fmt=d=>new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+function setMsg(el,txt,type){el.textContent=txt;el.className='msg'+(type?' '+type:'');if(!txt)el.style.display='none';}
+function setFb(txt,type){const f=el('cfb');f.textContent=txt;f.className='cfb '+type;}
+</script>
+</body>
+</html>
