@@ -85,7 +85,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
 @keyframes dotB{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.5);opacity:1}}
 
 /* ─── AUTH ─── */
-#page-auth{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;min-height:100vh}
+#page-auth{flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;min-height:100vh}
+#page-auth.active{display:flex}
 .auth-hero{text-align:center;margin-bottom:36px}
 .auth-gem{font-size:70px;display:block;filter:drop-shadow(0 0 24px rgba(200,146,42,.6));animation:gemB 3s ease-in-out infinite}
 .auth-title{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:700;letter-spacing:5px;text-transform:uppercase;background:linear-gradient(150deg,var(--cream) 0%,var(--gold3) 40%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-top:8px}
@@ -350,7 +351,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
 <div id="app">
 
 <!-- ══ LOGIN ══ -->
-<div id="page-auth" class="page active" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+<div id="page-auth" class="page active">
   <div class="auth-hero">
     <span class="auth-gem">💎</span>
     <div class="auth-title">Scarlat</div>
@@ -824,14 +825,23 @@ function createStars() {
 addEventListener('DOMContentLoaded', async () => {
   createStars();
   setTimeout(() => el('loading').classList.add('gone'), 2200);
-  try {
-    const { data: { session } } = await db.auth.getSession();
-    if (session?.user) { await boot(session.user); return; }
-  } catch(e) {}
+
+  // Escuta mudanças de login/logout sempre, mesmo quando já existe sessão ativa.
   db.auth.onAuthStateChange(async (ev, s) => {
     if (ev === 'SIGNED_IN' && s?.user) await boot(s.user);
     if (ev === 'SIGNED_OUT') showAuth();
   });
+
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    if (session?.user) {
+      await boot(session.user);
+    } else {
+      showAuth();
+    }
+  } catch(e) {
+    showAuth();
+  }
 });
 
 async function boot(user) {
@@ -903,43 +913,89 @@ async function doOut() { await db.auth.signOut(); }
 /* ════════════════════════════════════════════
    NAVEGAÇÃO — páginas separadas via hash
 ════════════════════════════════════════════ */
+function hideAllPages() {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+}
+
 function showAuth() {
-  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
-  const sa=el('page-auth');
-  sa.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center';
-  sa.classList.add('active');
-  el('nav').style.display='none';
-  USER=null;PROF=null;
-  history.pushState(null,'','#/login');
+  USER = null;
+  PROF = null;
+  hideAllPages();
+
+  const sa = el('page-auth');
+  if (sa) {
+    sa.style.display = 'flex';
+    sa.classList.add('active');
+  }
+
+  const nav = el('nav');
+  if (nav) nav.style.display = 'none';
+
+  if (location.hash !== '#/login') history.replaceState(null, '', '#/login');
 }
 
 function showLoggedIn() {
-  el('nav').style.display='block';
-  if(PROF?.role==='admin') el('nb-admin').style.display='flex';
-  go('lobby');
+  hideAllPages();
+
+  const nav = el('nav');
+  if (nav) nav.style.display = 'block';
+
+  const adminBtn = el('nb-admin');
+  if (adminBtn) adminBtn.style.display = PROF?.role === 'admin' ? 'flex' : 'none';
+
+  go('lobby', true);
 }
 
-function go(page) {
-  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
-  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
-  const pg=el('page-'+page);
-  pg.style.display='block';pg.classList.add('active');
-  const nb=el('nb-'+page);if(nb)nb.classList.add('on');
-  history.pushState(null,'','#/'+page);
-  window.scrollTo(0,0);
+function go(page, replace = false) {
+  if (!USER && page !== 'auth' && page !== 'login') {
+    showAuth();
+    return;
+  }
+
+  const normalized = page === 'login' ? 'auth' : page;
+  hideAllPages();
+
+  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('on'));
+
+  const pg = el('page-' + normalized);
+  if (!pg) return;
+
+  pg.style.display = normalized === 'auth' ? 'flex' : 'block';
+  pg.classList.add('active');
+
+  const nav = el('nav');
+  if (nav) nav.style.display = normalized === 'auth' ? 'none' : 'block';
+
+  const adminBtn = el('nb-admin');
+  if (adminBtn) adminBtn.style.display = PROF?.role === 'admin' ? 'flex' : 'none';
+
+  const nb = el('nb-' + normalized);
+  if (nb) nb.classList.add('on');
+
+  const targetHash = '#/' + (normalized === 'auth' ? 'login' : normalized);
+  if (location.hash !== targetHash) {
+    if (replace) history.replaceState(null, '', targetHash);
+    else history.pushState(null, '', targetHash);
+  }
+
+  window.scrollTo(0, 0);
 
   // Render por página
-  if(page==='lobby')      renderLobby();
-  if(page==='premios')    renderPrizesPage();
-  if(page==='tabuleiro')  renderBoardPage();
-  if(page==='historico')  renderHistory();
-  if(page==='admin')      { adminTab('codigos'); renderAdminData(); }
+  if (normalized === 'lobby')      renderLobby();
+  if (normalized === 'premios')    renderPrizesPage();
+  if (normalized === 'tabuleiro')  renderBoardPage();
+  if (normalized === 'historico')  renderHistory();
+  if (normalized === 'admin')      { adminTab('codigos'); renderAdminData(); }
 }
 
 // Hash routing no carregamento
 window.addEventListener('popstate', () => {
   const hash = location.hash.replace('#/','') || 'lobby';
-  if(USER && hash !== 'login') go(hash);
+  if (!USER || hash === 'login') showAuth();
+  else go(hash, true);
 });
 
 /* ════════════════════════════════════════════
