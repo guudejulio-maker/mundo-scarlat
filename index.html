@@ -333,6 +333,31 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:rgba(200,146,42,.2);border-radius:2px}
+
+
+/* ═══ FASE 2.1 — POLIMENTO PREMIUM SCARLAT ═══ */
+:root{--glass:rgba(255,255,255,.055);--line:rgba(255,255,255,.09)}
+.lobby-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(255,217,128,.08),transparent 24%),radial-gradient(circle at 50% 80%,rgba(224,64,122,.08),transparent 30%);pointer-events:none;z-index:0}
+.admin-card{box-shadow:0 18px 60px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06)}
+.admin-card h3{font-size:11px;color:var(--gold2)}
+.roll-preview{margin:-4px 0 14px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(200,146,42,.13),rgba(224,64,122,.08));border:1px solid rgba(200,146,42,.25);color:var(--gold3);font-size:12px;line-height:1.45;font-weight:800}
+.roll-preview small{display:block;color:var(--t2);font-weight:700;margin-top:3px}
+.inp[readonly]{background:rgba(200,146,42,.08);border-color:rgba(200,146,42,.32);color:var(--gold3);font-weight:900}
+.board-wrap{box-shadow:0 24px 80px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.07)}
+.board-wrap::after{content:'Jornada Scarlat';position:absolute;top:14px;left:18px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:rgba(255,217,128,.58);letter-spacing:.5px;pointer-events:none}
+.dice-box{position:relative;width:118px;height:118px;border-radius:30px;background:radial-gradient(circle at 30% 25%,#fff 0%,#fff8e8 32%,#f0d6a2 100%);font-size:64px;box-shadow:0 18px 55px rgba(200,146,42,.40),0 0 0 9px rgba(200,146,42,.08),inset -14px -18px 30px rgba(120,70,20,.13),inset 10px 10px 18px rgba(255,255,255,.95)}
+.dice-box::after{content:'';position:absolute;inset:-12px;border-radius:36px;border:1px solid rgba(255,217,128,.25);box-shadow:0 0 30px rgba(255,217,128,.22);opacity:.8}
+.dice-box.rolling{animation:diceTumble .55s cubic-bezier(.34,1.56,.64,1) infinite;filter:drop-shadow(0 0 24px rgba(224,64,122,.45))}
+@keyframes diceTumble{0%{transform:rotateX(0) rotateY(0) rotateZ(0) scale(1)}25%{transform:rotateX(28deg) rotateY(-32deg) rotateZ(18deg) scale(1.05)}50%{transform:rotateX(-18deg) rotateY(34deg) rotateZ(-24deg) scale(.97)}75%{transform:rotateX(36deg) rotateY(18deg) rotateZ(28deg) scale(1.04)}100%{transform:rotateX(0) rotateY(0) rotateZ(0) scale(1)}}
+.roulette-outer{width:312px;height:312px;filter:drop-shadow(0 25px 55px rgba(0,0,0,.45))}
+#roulette-canvas{width:312px;height:312px;border-radius:50%;box-shadow:0 0 0 10px rgba(200,146,42,.20),0 0 0 2px rgba(255,217,128,.55),0 0 55px rgba(224,64,122,.22),inset 0 0 25px rgba(0,0,0,.35)}
+.roulette-pointer{top:-28px;font-size:42px;color:#fff8e8;text-shadow:0 5px 14px rgba(0,0,0,.8),0 0 18px rgba(255,217,128,.6)}
+.roulette-center{width:62px;height:62px;font-size:30px;border:4px solid rgba(255,255,255,.82);box-shadow:0 8px 28px rgba(200,146,42,.55),0 0 0 8px rgba(200,146,42,.12)}
+.btn-spin{font-size:25px;padding:18px 52px;border-radius:24px}
+.prize-card{box-shadow:0 12px 35px rgba(0,0,0,.18)}
+/* Admin mais legível em desktop */
+@media(min-width:700px){#app{max-width:480px}.nav{max-width:480px}.roulette-outer{width:330px;height:330px}#roulette-canvas{width:330px;height:330px}}
+
 </style>
 </head>
 <body>
@@ -560,9 +585,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
       <div class="fg"><label>Código (você define)</label>
         <input class="inp" id="a-code" type="text" placeholder="Ex: ROSA2025" style="text-transform:uppercase;letter-spacing:4px;font-weight:900;font-size:16px"></div>
       <div class="irow">
-        <div class="fg"><label>Jogadas</label><input class="inp" id="a-rolls" type="number" min="1" max="20" value="3"></div>
-        <div class="fg"><label>Valor R$</label><input class="inp" id="a-val" type="number" placeholder="300"></div>
+        <div class="fg"><label>Valor R$</label><input class="inp" id="a-val" type="number" min="0" step="0.01" placeholder="2000" oninput="calcAdminRolls()"></div>
+        <div class="fg"><label>Jogadas calculadas</label><input class="inp" id="a-rolls" type="number" min="0" max="1000" value="0" readonly></div>
       </div>
+      <div class="roll-preview" id="a-roll-helper">Regra ativa: R$ 500 = 1 jogada.<small>Digite o valor da compra para calcular automaticamente.</small></div>
       <div class="fg"><label>Descrição interna</label><input class="inp" id="a-desc" type="text" placeholder="ex: Anéis — Maria Silva"></div>
       <button class="btn-adm" style="width:100%;padding:13px" onclick="adminCreateCode()">✨ Criar Código</button>
       <div class="code-disp" id="a-code-disp">
@@ -624,7 +650,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
     <div class="admin-card">
       <h3>🗺️ Configurar Casa</h3>
       <div class="irow">
-        <div class="fg"><label>Número da Casa</label><input class="inp" id="ac-num" type="number" min="1" max="50" placeholder="10"></div>
+        <div class="fg"><label>Número da Casa</label><input class="inp" id="ac-num" type="number" min="1" max="700" placeholder="10"></div>
         <div class="fg"><label>Tipo</label>
           <select class="inp" id="ac-type" style="-webkit-appearance:none">
             <option value="comum">Comum</option>
@@ -804,6 +830,8 @@ let rouletteTargetIdx = 0;
 
 const CAT_COLORS = {comum:'#ffffff14',especial:'#c8922a20',premium:'#c8922a35',grande_premio:'#e0407a20'};
 const CELL_ICONS = {comum:'',premio:'🏆',bau:'🎁',roleta:'🎡',roleta_premium:'👑',bonus:'⭐',chave:'🔑',grande_premio:'✨'};
+const ROLL_VALUE = 500; // R$ 500 = 1 jogada
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
 
 /* ════════════════════════════════════════════
    PARTÍCULAS
@@ -825,6 +853,9 @@ function createStars() {
 addEventListener('DOMContentLoaded', async () => {
   createStars();
   setTimeout(() => el('loading').classList.add('gone'), 2200);
+  const aval = el('a-val');
+  if (aval) aval.addEventListener('input', calcAdminRolls);
+  calcAdminRolls();
   try {
     const { data: { session } } = await db.auth.getSession();
     if (session?.user) { await boot(session.user); return; }
@@ -1035,32 +1066,42 @@ function renderPrizesPage() {
    TABULEIRO CANVAS — Serpentina
 ════════════════════════════════════════════ */
 function buildSerpentine(total, w) {
-  const cols = 5, pad = 12;
+  // Em tabuleiro de 700 casas, não desenhamos 700 quadradinhos.
+  // Desenhamos uma jornada premium: início, casa atual, vizinhança, marcos especiais e final.
+  const current = Math.max(0, Math.min(total, Math.round(WALLET.current_house || PROF?.current_house || 0)));
+  const specialNums = (BOARD_CELLS || []).map(c => Number(c.cell_number)).filter(n => n > 0 && n <= total);
+  const nums = new Set([1, total, current || 1]);
+
+  // Janela local: dá sensação de caminho real sem virar uma parede infinita de casas.
+  for (let n = Math.max(1, current - 10); n <= Math.min(total, current + 18); n++) nums.add(n);
+  specialNums.forEach(n => nums.add(n));
+
+  const displayNums = Array.from(nums).filter(Boolean).sort((a,b)=>a-b);
+  const pad = 18;
+  const topPad = 82;
+  const cols = 4;
   const cellW = (w - pad*2) / cols;
-  const cellH = cellW;
-  const rows = Math.ceil(total / cols);
-  const totalH = rows * cellH + pad * 2;
+  const cellH = Math.max(66, cellW * .82);
+  const rows = Math.ceil(displayNums.length / cols);
+  const totalH = topPad + rows * cellH + 38;
   const positions = [];
 
-  for (let row = rows - 1; row >= 0; row--) {
-    const rowIndex = rows - 1 - row;
-    const fromLeft = rowIndex % 2 === 0;
-    for (let ci = 0; ci < cols; ci++) {
-      const col = fromLeft ? ci : (cols - 1 - ci);
-      const num = (rows - 1 - row) * cols + ci + 1;
-      if (num > total) continue;
-      positions.push({
-        num,
-        x: pad + col * cellW + cellW / 2,
-        y: pad + row * cellH + cellH / 2,
-        w: cellW - 6, h: cellH - 6
-      });
-    }
-  }
-  positions.sort((a,b)=>a.num-b.num);
+  displayNums.forEach((num, idx) => {
+    const row = Math.floor(idx / cols);
+    const colInRow = idx % cols;
+    const fromLeft = row % 2 === 0;
+    const col = fromLeft ? colInRow : (cols - 1 - colInRow);
+    positions.push({
+      num,
+      x: pad + col * cellW + cellW / 2,
+      y: topPad + row * cellH + cellH / 2,
+      w: cellW - 9,
+      h: cellH - 11,
+      displayIndex: idx
+    });
+  });
   return { positions, totalH };
 }
-
 function rRect(ctx,x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
   ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
@@ -1070,15 +1111,25 @@ function rRect(ctx,x,y,w,h,r){
 
 function drawBoardFrame() {
   if(!BC||!BCTX||!WALLET.total_houses) return;
-  const cur = PROF?.current_house || 0;
+  const cur = WALLET.current_house || PROF?.current_house || 0;
   const anim = Math.round(ANIM_POS)||cur;
   const t = Date.now();
   BCTX.clearRect(0,0,BOARD_W,BOARD_H);
 
+  // Barra de progresso geral da temporada
+  const progress = Math.max(0, Math.min(1, cur / (WALLET.total_houses || 1)));
+  BCTX.save();
+  BCTX.fillStyle='rgba(0,0,0,.28)';
+  rRect(BCTX,18,42,BOARD_W-36,16,8);BCTX.fill();
+  const pg=BCTX.createLinearGradient(18,42,BOARD_W-18,42);pg.addColorStop(0,'#e0407a');pg.addColorStop(.55,'#e8b84a');pg.addColorStop(1,'#fff8e8');
+  BCTX.fillStyle=pg;rRect(BCTX,18,42,(BOARD_W-36)*progress,16,8);BCTX.fill();
+  BCTX.font='800 11px Nunito,sans-serif';BCTX.fillStyle='rgba(255,240,248,.78)';BCTX.textAlign='right';BCTX.fillText(`Casa ${cur} de ${WALLET.total_houses||0}`,BOARD_W-18,34);
+  BCTX.restore();
+
   // Trilha conectando casas
   if(CELL_POSITIONS.length>1){
     BCTX.save();
-    BCTX.setLineDash([4,8]);BCTX.lineWidth=2;BCTX.strokeStyle='rgba(200,146,42,.12)';BCTX.lineCap='round';
+    BCTX.setLineDash([6,9]);BCTX.lineWidth=3;BCTX.strokeStyle='rgba(200,146,42,.22)';BCTX.lineCap='round';
     BCTX.beginPath();BCTX.moveTo(CELL_POSITIONS[0].x,CELL_POSITIONS[0].y);
     CELL_POSITIONS.forEach(p=>BCTX.lineTo(p.x,p.y));
     BCTX.stroke();BCTX.setLineDash([]);BCTX.restore();
@@ -1088,8 +1139,8 @@ function drawBoardFrame() {
     const num=pos.num;
     const cell=BOARD_CELLS.find(c=>c.cell_number===num);
     const isSpecial=cell&&cell.cell_type!=='comum';
-    const isCur=num===anim;
-    const isPast=num<(ANIM_POS||cur);
+    const isCur=num===anim || num===cur;
+    const isPast=num<cur;
     const hw=pos.w/2,hh=pos.h/2,rad=pos.w*.16;
 
     BCTX.save();BCTX.translate(pos.x,pos.y);
@@ -1129,11 +1180,14 @@ function drawBoardFrame() {
     BCTX.restore();
   });
 
-  // Avatar Tainá
+  // Avatar da jogadora — procura a casa atual na jornada desenhada
   const houseIdx=(ANIM_POS>0?Math.round(ANIM_POS):cur);
   if(houseIdx>0&&CELL_POSITIONS.length>0){
-    const p=CELL_POSITIONS[Math.min(houseIdx-1,CELL_POSITIONS.length-1)];
-    if(p)drawAvatar(p.x,p.y-p.h*.5-14,p.w*.7,t);
+    let p=CELL_POSITIONS.find(pp=>pp.num===houseIdx);
+    if(!p){
+      p=[...CELL_POSITIONS].reverse().find(pp=>pp.num<=houseIdx) || CELL_POSITIONS[0];
+    }
+    if(p)drawAvatar(p.x,p.y-p.h*.5-14,Math.min(p.w*.78,46),t);
   }
 }
 
@@ -1218,12 +1272,14 @@ async function doRollDice() {
   el('dice-box').classList.add('rolling');
   el('dice-box').textContent='🎲';
   el('dice-result-txt').textContent='Girando…';
+  const diceTimer = setInterval(()=>{ el('dice-box').textContent = DICE_FACES[Math.floor(Math.random()*6)]; }, 90);
 
   try {
     const{data,error}=await db.rpc('roll_dice');
     if(error)throw error;
 
     if(!data.success){
+      clearInterval(diceTimer);
       el('dice-box').classList.remove('rolling');
       el('dice-result-txt').textContent=data.error;
       setTimeout(()=>closeModal('modal-dice'),2500);
@@ -1231,7 +1287,7 @@ async function doRollDice() {
     }
 
     // Mostra resultado do dado
-    const DICE_FACES=['⚀','⚁','⚂','⚃','⚄','⚅'];
+    clearInterval(diceTimer);
     el('dice-box').classList.remove('rolling');
     el('dice-box').textContent=DICE_FACES[data.dice_result-1];
     el('dice-result-txt').textContent=`Você tirou ${data.dice_result}! Avançando ${data.dice_result} ${data.dice_result===1?'casa':'casas'}…`;
@@ -1296,6 +1352,7 @@ async function doRollDice() {
     });
 
   } catch(e) {
+    clearInterval(diceTimer);
     el('dice-box').classList.remove('rolling');
     el('dice-result-txt').textContent='Erro. Tente novamente.';
     setTimeout(()=>closeModal('modal-dice'),2000);
@@ -1347,59 +1404,70 @@ async function doUseCode() {
 ════════════════════════════════════════════ */
 function drawRoulette(rotation){
   RC=el('roulette-canvas');RCTX=RC.getContext('2d');
-  const cx=140,cy=140,outerR=138,innerR=38;
+  // garante resolução boa mesmo com CSS maior
+  const cssSize = RC.getBoundingClientRect().width || 312;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  if(RC.width !== Math.round(cssSize*dpr)){
+    RC.width = Math.round(cssSize*dpr); RC.height = Math.round(cssSize*dpr);
+  }
+  const size=RC.width, cx=size/2, cy=size/2, outerR=size*.48, innerR=size*.18;
   const slices=ROULETTE_PRIZES.length;
   const sliceAngle=(Math.PI*2)/slices;
+  RCTX.clearRect(0,0,size,size);
 
-  RCTX.clearRect(0,0,280,280);
+  // Fundo externo
+  const halo=RCTX.createRadialGradient(cx,cy,innerR,cx,cy,outerR+20*dpr);
+  halo.addColorStop(0,'rgba(255,248,232,.08)');halo.addColorStop(.75,'rgba(200,146,42,.18)');halo.addColorStop(1,'rgba(0,0,0,.25)');
+  RCTX.beginPath();RCTX.arc(cx,cy,outerR+10*dpr,0,Math.PI*2);RCTX.fillStyle=halo;RCTX.fill();
 
   ROULETTE_PRIZES.forEach((prize,i)=>{
-    const startA=rotation+i*sliceAngle;
+    const startA=rotation+i*sliceAngle-Math.PI/2;
     const endA=startA+sliceAngle;
     const midA=startA+sliceAngle/2;
+    const g=RCTX.createRadialGradient(cx,cy,innerR,cx,cy,outerR);
+    g.addColorStop(0,'#fff8e822');g.addColorStop(.18,prize.color);g.addColorStop(1,shadeColor(prize.color,-28));
+    RCTX.beginPath();RCTX.moveTo(cx,cy);RCTX.arc(cx,cy,outerR,startA,endA);RCTX.closePath();RCTX.fillStyle=g;RCTX.fill();
+    RCTX.strokeStyle='rgba(255,248,232,.26)';RCTX.lineWidth=2*dpr;RCTX.stroke();
 
-    // Fatia
-    RCTX.beginPath();
-    RCTX.moveTo(cx,cy);
-    RCTX.arc(cx,cy,outerR,startA,endA);
-    RCTX.closePath();
-    RCTX.fillStyle=prize.color;
-    RCTX.fill();
-    RCTX.strokeStyle='rgba(255,255,255,.15)';
-    RCTX.lineWidth=1.5;
-    RCTX.stroke();
-
-    // Ícone
+    // faixa interna para leitura
     RCTX.save();
-    RCTX.translate(cx+Math.cos(midA)*(outerR*.65),cy+Math.sin(midA)*(outerR*.65));
+    RCTX.translate(cx+Math.cos(midA)*(outerR*.61),cy+Math.sin(midA)*(outerR*.61));
     RCTX.rotate(midA+Math.PI/2);
-    RCTX.font='18px serif';
     RCTX.textAlign='center';RCTX.textBaseline='middle';
-    RCTX.fillText(prize.icon,0,0);
-    RCTX.restore();
-
-    // Texto
-    RCTX.save();
-    RCTX.translate(cx+Math.cos(midA)*(outerR*.38),cy+Math.sin(midA)*(outerR*.38));
-    RCTX.rotate(midA+Math.PI/2);
-    RCTX.font='bold 9px Nunito,sans-serif';
-    RCTX.fillStyle='rgba(255,255,255,.85)';
-    RCTX.textAlign='center';RCTX.textBaseline='middle';
-    const words=prize.name.split(' ');
-    words.forEach((w,wi)=>RCTX.fillText(w,0,(wi-words.length/2+.5)*11));
+    RCTX.font=`${Math.round(22*dpr)}px serif`;
+    RCTX.fillText(prize.icon,0,-13*dpr);
+    RCTX.font=`900 ${Math.round(9.6*dpr)}px Nunito,sans-serif`;
+    RCTX.fillStyle='rgba(255,255,255,.96)';
+    RCTX.shadowColor='rgba(0,0,0,.65)';RCTX.shadowBlur=4*dpr;
+    const label=prize.name.replace('Moto Elétrica','Moto').replace('Cashback R$100','Cashback\nR$100').replace('Cashback R$150','Cashback\nR$150');
+    label.split('\n').forEach((line,idx,arr)=>RCTX.fillText(line,0,(idx-(arr.length-1)/2)*12*dpr+13*dpr));
     RCTX.restore();
   });
 
-  // Borda externa dourada
-  RCTX.beginPath();RCTX.arc(cx,cy,outerR,0,Math.PI*2);
-  RCTX.strokeStyle='rgba(200,146,42,.6)';RCTX.lineWidth=3;RCTX.stroke();
+  // anéis premium
+  [outerR+2*dpr, outerR-8*dpr, innerR+8*dpr].forEach((r,idx)=>{
+    RCTX.beginPath();RCTX.arc(cx,cy,r,0,Math.PI*2);
+    RCTX.strokeStyle=idx===0?'rgba(255,217,128,.9)':idx===1?'rgba(255,248,232,.2)':'rgba(255,217,128,.55)';
+    RCTX.lineWidth=idx===0?5*dpr:2*dpr;RCTX.stroke();
+  });
+  // marcadores dourados
+  for(let i=0;i<slices;i++){
+    const a=rotation+i*sliceAngle-Math.PI/2;
+    RCTX.beginPath();RCTX.arc(cx+Math.cos(a)*outerR,cy+Math.sin(a)*outerR,3.2*dpr,0,Math.PI*2);
+    RCTX.fillStyle='#fff8e8';RCTX.fill();
+  }
 
-  // Centro
-  RCTX.beginPath();RCTX.arc(cx,cy,innerR,0,Math.PI*2);
-  const cg=RCTX.createRadialGradient(cx-5,cy-5,2,cx,cy,innerR);
-  cg.addColorStop(0,'#fff8e8');cg.addColorStop(1,'#c8922a');
-  RCTX.fillStyle=cg;RCTX.fill();
-  RCTX.strokeStyle='rgba(255,255,255,.6)';RCTX.lineWidth=2;RCTX.stroke();
+  const cg=RCTX.createRadialGradient(cx-8*dpr,cy-8*dpr,2*dpr,cx,cy,innerR);
+  cg.addColorStop(0,'#fff8e8');cg.addColorStop(.48,'#ffd980');cg.addColorStop(1,'#9b6416');
+  RCTX.beginPath();RCTX.arc(cx,cy,innerR,0,Math.PI*2);RCTX.fillStyle=cg;RCTX.fill();
+  RCTX.strokeStyle='rgba(255,255,255,.78)';RCTX.lineWidth=4*dpr;RCTX.stroke();
+  RCTX.font=`${Math.round(30*dpr)}px serif`;RCTX.textAlign='center';RCTX.textBaseline='middle';RCTX.fillText('💎',cx,cy+1*dpr);
+}
+
+function shadeColor(hex, percent) {
+  const f=parseInt(hex.slice(1),16),t=percent<0?0:255,p=Math.abs(percent)/100;
+  const R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+  return '#'+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
 }
 
 async function doSpin(){
@@ -1422,7 +1490,7 @@ async function doSpin(){
     const prizeIdx=ROULETTE_PRIZES.findIndex(p=>
       data.reward_name?.toLowerCase().includes(p.name.toLowerCase().split(' ')[0].toLowerCase())
     );
-    const targetIdx=prizeIdx>=0?prizeIdx:Math.floor(Math.random()*ROULETTE_PRIZES.length);
+    const targetIdx=prizeIdx>=0?prizeIdx:0;
 
     // Anima roleta
     const sliceAngle=(Math.PI*2)/ROULETTE_PRIZES.length;
@@ -1568,14 +1636,17 @@ async function renderAdminData(){
     :'<p style="font-size:13px;color:var(--t3)">Nenhuma cliente ainda.</p>';
 
   // Pendentes
-  const{data:pend}=await db.from('prize_claims').select('*,profiles(full_name),house_prizes(name,icon,category)').eq('delivered',false).order('claimed_at');
-  el('a-pending').innerHTML=pend?.length?pend.map(p=>`
+  const{data:pend}=await db.from('prize_claims').select('*,profiles(full_name),house_prizes(name,icon,category),reward_catalog(name,icon,category)').eq('delivered',false).order('claimed_at');
+  el('a-pending').innerHTML=pend?.length?pend.map(p=>{
+    const prize = p.reward_catalog || p.house_prizes || {};
+    return `
     <div class="hist-item" style="margin-bottom:8px">
-      <div class="hi-icon">${p.house_prizes?.icon||'🎁'}</div>
-      <div class="hi-info"><div class="hi-title">${p.house_prizes?.name||'Prêmio'}</div>
+      <div class="hi-icon">${prize.icon||'🎁'}</div>
+      <div class="hi-info"><div class="hi-title">${prize.name||'Prêmio'}</div>
       <div class="hi-sub">${p.profiles?.full_name||'?'} · Casa ${p.house_number} · ${fmt(p.claimed_at)}</div></div>
       <button class="del-btn" onclick="deliver('${p.id}')">✅</button>
-    </div>`).join('')
+    </div>`;
+  }).join('')
     :'<p style="font-size:13px;color:var(--t3)">✅ Nenhum pendente.</p>';
 
   // Reward catalog (admin vê tudo)
@@ -1601,13 +1672,27 @@ async function renderAdminData(){
     :'<p style="font-size:13px;color:var(--t3)">Nenhuma atividade.</p>';
 }
 
+function calcAdminRolls(){
+  const val = parseFloat(v('a-val')) || 0;
+  const rolls = Math.max(0, Math.floor(val / ROLL_VALUE));
+  const rollsInput = el('a-rolls');
+  if(rollsInput) rollsInput.value = rolls;
+  const helper = el('a-roll-helper');
+  if(helper){
+    const next = (Math.floor(val/ROLL_VALUE)+1)*ROLL_VALUE;
+    helper.innerHTML = `Regra ativa: R$ ${ROLL_VALUE.toLocaleString('pt-BR')} = 1 jogada. <strong>${rolls} jogada${rolls===1?'':'s'}</strong> calculada${rolls===1?'':'s'}.<small>${rolls>0 ? 'Perfeito. Código já sai na régua certa.' : `Faltam R$ ${Math.max(0,next-val).toLocaleString('pt-BR')} para liberar 1 jogada.`}</small>`;
+  }
+  return rolls;
+}
+
 async function adminCreateCode(){
   const code=v('a-code').toUpperCase().trim();
-  const rolls=parseInt(v('a-rolls'))||3;
-  const val=parseFloat(v('a-val'))||null;
+  const val=parseFloat(v('a-val'))||0;
+  const rolls=calcAdminRolls();
   const desc=v('a-desc').trim()||null;
   const m=el('a-code-msg');
   if(code.length<4){setMsg(m,'Código precisa ter pelo menos 4 caracteres.','err');return;}
+  if(val < ROLL_VALUE || rolls < 1){setMsg(m,`Valor mínimo para gerar jogada é R$ ${ROLL_VALUE.toLocaleString('pt-BR')}.`,'err');return;}
   const{data,error}=await db.rpc('admin_create_code',{
     p_plain_code:code,p_houses_to_advance:rolls,
     p_purchase_value:val,p_purchase_description:desc
