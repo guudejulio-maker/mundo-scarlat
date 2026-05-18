@@ -3,398 +3,1156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0d0416">
+<meta name="theme-color" content="#0a0114">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Mundo Scarlat 💎</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<title>Mundo Scarlat</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  --pk:#c8407a;--pk2:#e870a8;--pk3:#ff9fd0;
-  --gd:#c8963a;--gd2:#e8c06a;--gd3:#fff0b0;
-  --pu:#1a0830;--pu2:#2d1255;--pu3:#4a1e88;
-  --bg:#0d0416;
-  --txt:#fff0ff;--txt2:#d090c0;--txt3:#905080;
-  --r:16px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow-x:hidden}
-body{
-  font-family:'Nunito',sans-serif;
-  background:var(--bg);color:var(--txt);
-  background-image:
-    radial-gradient(ellipse 140% 60% at 50% 0%,#3a0860 0%,transparent 60%),
-    radial-gradient(circle at 15% 85%,#200438 0%,transparent 45%),
-    radial-gradient(circle at 88% 15%,#1a0330 0%,transparent 45%);
+/* ════════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════ */
+:root {
+  /* Paleta principal */
+  --ruby:    #9b1942;
+  --ruby2:   #c42058;
+  --rose:    #e0407a;
+  --rose2:   #f070a0;
+  --blush:   #ffa0c8;
+  --gold:    #c8922a;
+  --gold2:   #e8b84a;
+  --gold3:   #ffd980;
+  --cream:   #fff8e8;
+  --wine:    #4a0820;
+  --wine2:   #6a1030;
+
+  /* Fundos */
+  --bg:      #0a0114;
+  --bg2:     #120220;
+  --bg3:     #1e0835;
+  --bg4:     #2a0e48;
+
+  /* Textos */
+  --t1: #fff0f8;
+  --t2: #d8a0c0;
+  --t3: #9060a0;
+  --t4: #60304a;
+
+  /* Glassmorphism */
+  --g1: rgba(255,255,255,0.04);
+  --g2: rgba(255,255,255,0.07);
+  --g3: rgba(255,255,255,0.10);
+  --b1: rgba(200,146,42,0.15);
+  --b2: rgba(200,146,42,0.30);
+  --b3: rgba(200,32,88,0.20);
+  --b4: rgba(200,32,88,0.40);
+
+  /* Sombras de cor */
+  --sgold: 0 8px 32px rgba(200,146,42,0.35);
+  --srose: 0 8px 32px rgba(224,64,122,0.40);
+  --sruby: 0 8px 32px rgba(155,25,66,0.50);
+
+  /* Radii */
+  --r1: 12px; --r2: 18px; --r3: 24px; --r4: 32px;
 }
 
-/* ─── PARTÍCULAS ─── */
-#particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.star{position:absolute;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite var(--del,0s)}
-@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
-
-#app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100vh}
-
-/* ─── LOADING ─── */
-#loading{
-  position:fixed;inset:0;z-index:999;
-  background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity .8s ease;
-}
-#loading.gone{opacity:0;pointer-events:none}
-.ld-crown{font-size:80px;animation:crownFloat 2s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(200,150,58,.8))}
-@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-12px) rotate(5deg)}}
-.ld-name{
-  font-family:'Playfair Display',serif;font-size:52px;font-weight:900;
-  letter-spacing:6px;text-transform:uppercase;
-  background:linear-gradient(135deg,var(--gd3),var(--gd),#a07020);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  margin-top:10px;
-}
-.ld-tag{font-size:12px;letter-spacing:4px;color:var(--txt3);text-transform:uppercase;margin-top:6px}
-.ld-dots{display:flex;gap:8px;margin-top:32px}
-.ld-dot{width:8px;height:8px;border-radius:50%;background:var(--pk);animation:dotPop .8s ease-in-out infinite}
-.ld-dot:nth-child(2){background:var(--gd);animation-delay:.15s}
-.ld-dot:nth-child(3){background:var(--pk2);animation-delay:.3s}
-@keyframes dotPop{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.6);opacity:1}}
-
-/* ─── SCREEN ─── */
-.screen{display:none;min-height:100vh;padding-bottom:90px}
-.screen.active{display:block;animation:fadeUp .3s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-/* ─── AUTH ─── */
-#screen-auth{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:36px 20px;min-height:100vh;
-}
-.auth-brand{text-align:center;margin-bottom:36px}
-.auth-gem{font-size:72px;display:block;animation:crownFloat 3s ease-in-out infinite;
-  filter:drop-shadow(0 0 24px rgba(200,150,58,.6))}
-.auth-title{
-  font-family:'Playfair Display',serif;font-size:50px;font-weight:900;
-  letter-spacing:5px;text-transform:uppercase;
-  background:linear-gradient(135deg,var(--gd3),var(--gd2),var(--gd));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  line-height:1;margin-top:8px;
-}
-.auth-sub{font-size:11px;letter-spacing:3px;color:var(--txt3);text-transform:uppercase;margin-top:8px}
-.auth-deco{color:var(--gd);opacity:.5;font-size:14px;letter-spacing:8px;margin-top:12px}
-
-.auth-box{
-  width:100%;background:rgba(255,255,255,.04);
-  border:1px solid rgba(200,150,58,.2);border-radius:28px;
-  padding:28px 22px;backdrop-filter:blur(32px);
-  box-shadow:0 32px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07);
-}
-.tabs{display:flex;background:rgba(0,0,0,.35);border-radius:14px;padding:4px;margin-bottom:24px}
-.tab{flex:1;padding:11px;border:none;background:transparent;color:var(--txt3);
-  font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;
-  border-radius:11px;transition:all .25s}
-.tab.on{background:linear-gradient(135deg,var(--pk),#8a1045);color:#fff;
-  box-shadow:0 4px 20px rgba(200,64,122,.4)}
-.fg{margin-bottom:15px}
-.fg label{display:block;font-size:10px;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:var(--txt3);margin-bottom:6px}
-.inp{width:100%;padding:14px 16px;background:rgba(0,0,0,.3);
-  border:1px solid rgba(200,150,58,.2);border-radius:14px;color:var(--txt);
-  font-family:'Nunito',sans-serif;font-size:15px;transition:border-color .2s;-webkit-appearance:none}
-.inp:focus{outline:none;border-color:var(--gd);background:rgba(255,255,255,.06)}
-.inp::placeholder{color:rgba(255,255,255,.2)}
-.btn-enter{
-  width:100%;padding:16px;border:none;border-radius:14px;cursor:pointer;
-  background:linear-gradient(135deg,var(--gd3),var(--gd2),var(--gd));
-  color:#1a0830;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
-  box-shadow:0 6px 28px rgba(200,150,58,.4);transition:all .25s;position:relative;overflow:hidden;
-}
-.btn-enter::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.3),transparent 55%);border-radius:inherit}
-.btn-enter:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(200,150,58,.55)}
-.btn-enter:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.amsg{margin-top:12px;padding:12px 15px;border-radius:12px;font-size:13px;font-weight:600;display:none;line-height:1.4}
-.amsg.err{background:rgba(200,64,122,.14);border:1px solid rgba(200,64,122,.3);color:#ffaac8;display:block}
-.amsg.ok{background:rgba(200,150,58,.12);border:1px solid rgba(200,150,58,.28);color:var(--gd2);display:block}
-
-/* ─── TOPBAR ─── */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px}
-.user-pill{display:flex;align-items:center;gap:10px}
-.ava{width:44px;height:44px;border-radius:50%;border:2px solid var(--gd);
-  display:flex;align-items:center;justify-content:center;font-size:22px;
-  background:linear-gradient(135deg,var(--pk),var(--pu2));
-  box-shadow:0 0 18px rgba(200,150,58,.3);overflow:hidden;flex-shrink:0}
-.ava img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.uname{font-size:14px;font-weight:800}
-.usub{font-size:11px;color:var(--txt2)}
-/* moedas no topo */
-.coins-bar{display:flex;align-items:center;gap:6px}
-.coin-chip{
-  display:flex;align-items:center;gap:4px;
-  background:rgba(0,0,0,.3);border:1px solid rgba(200,150,58,.25);
-  border-radius:20px;padding:5px 10px;font-size:12px;font-weight:800;color:var(--gd2);
+/* ════════════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow-x: hidden; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100%;
 }
 
-/* ─── SEASON BANNER ─── */
-.season-hero{
-  margin:8px 14px 0;border-radius:24px;overflow:hidden;
-  position:relative;padding:20px 18px 16px;text-align:center;
-  background:linear-gradient(160deg,rgba(200,64,122,.25),rgba(45,18,85,.8));
-  border:1px solid rgba(200,64,122,.3);
-}
-.season-hero::before{
-  content:'';position:absolute;inset:0;
-  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8963a' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-.season-hero::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,64,122,.6),transparent);
-}
-.s-eyebrow{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
-  color:var(--pk3);font-weight:700;margin-bottom:6px}
-.s-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
-  font-style:italic;color:#fff;margin-bottom:12px;text-shadow:0 0 20px rgba(200,64,122,.5)}
-.s-progress{display:flex;align-items:center;gap:10px}
-.s-bar{flex:1;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
-.s-fill{height:100%;border-radius:3px;
-  background:linear-gradient(90deg,var(--pk),var(--gd));
-  box-shadow:0 0 10px rgba(200,64,122,.5);
-  transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.s-txt{font-size:12px;font-weight:800;color:var(--gd2);white-space:nowrap}
-
-/* ─────────────────────────────────────
-   TABULEIRO ESPIRAL
-───────────────────────────────────── */
-.board-section{
-  margin:14px 14px 0;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(200,150,58,.15);
-  border-radius:24px;overflow:hidden;
-  position:relative;
-}
-/* gradiente de fundo do board */
-.board-section::before{
-  content:'';position:absolute;inset:0;
+/* ════════════════════════════════════════════
+   FUNDO VIVO — camadas de profundidade
+════════════════════════════════════════════ */
+#bg-layer {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 40%,rgba(200,64,122,.08),transparent),
-    radial-gradient(ellipse 60% 50% at 20% 80%,rgba(45,18,85,.5),transparent);
-  pointer-events:none;
+    radial-gradient(ellipse 150% 80% at 50% -5%,  #4a0a6a 0%, transparent 55%),
+    radial-gradient(ellipse 80%  60% at 0%   90%, #3a0828 0%, transparent 50%),
+    radial-gradient(ellipse 70%  50% at 100% 10%, #220540 0%, transparent 50%),
+    radial-gradient(ellipse 100% 40% at 50%  100%,#1a0230 0%, transparent 60%);
+}
+/* Grade sutil de diamante */
+#bg-layer::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(200,146,42,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,146,42,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
 }
 
-#game-canvas{
-  display:block;width:100%;
-  /* altura calculada pelo JS */
+/* ════════════════════════════════════════════
+   PARTÍCULAS
+════════════════════════════════════════════ */
+#particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.star {
+  position: absolute; border-radius: 50%;
+  animation: twinkle var(--d, 3s) ease-in-out infinite var(--dl, 0s);
+}
+@keyframes twinkle {
+  0%,100% { opacity: .15; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.5); }
 }
 
-/* ─── PRÓXIMO PRÊMIO ─── */
-.next-prize-bar{
-  display:flex;align-items:center;gap:12px;
-  margin:10px 14px 0;
-  background:rgba(200,150,58,.08);
-  border:1px solid rgba(200,150,58,.22);
-  border-radius:18px;padding:12px 16px;
-}
-.np-icon{font-size:28px;flex-shrink:0}
-.np-info{flex:1}
-.np-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);font-weight:700}
-.np-name{font-size:15px;font-weight:800;color:var(--gd2);margin-top:2px}
-.np-dist{font-size:11px;color:var(--txt2);margin-top:1px}
+/* ════════════════════════════════════════════
+   APP WRAPPER
+════════════════════════════════════════════ */
+#app { position: relative; z-index: 1; max-width: 430px; margin: 0 auto; min-height: 100vh; }
 
-/* ─── MARCOS STRIP ─── */
-.marcos-section{margin:14px 14px 0}
-.sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;
-  color:var(--txt3);font-weight:700;margin-bottom:10px;
-  display:flex;align-items:center;gap:8px}
-.sec-label::after{content:'';flex:1;height:1px;background:rgba(200,150,58,.15)}
-
-.marcos-strip{display:flex;gap:8px;overflow-x:auto;padding:2px;scrollbar-width:none}
-.marcos-strip::-webkit-scrollbar{display:none}
-.marco{
-  flex:0 0 80px;border-radius:16px;padding:12px 6px;
-  text-align:center;border:2px solid transparent;transition:all .2s;
-  background:rgba(255,255,255,.04);
+/* ════════════════════════════════════════════
+   TELA DE LOADING
+════════════════════════════════════════════ */
+#loading {
+  position: fixed; inset: 0; z-index: 999;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0;
+  transition: opacity .9s ease;
 }
-.marco.won{
-  background:linear-gradient(135deg,rgba(200,150,58,.2),rgba(138,98,34,.1));
-  border-color:rgba(200,150,58,.5);
-  box-shadow:0 4px 16px rgba(200,150,58,.2);
-}
-.marco.next{
-  background:rgba(200,64,122,.12);
-  border-color:rgba(200,64,122,.4);
-  box-shadow:0 4px 16px rgba(200,64,122,.2);
-  animation:nextPulse 2s ease-in-out infinite;
-}
-@keyframes nextPulse{0%,100%{box-shadow:0 4px 16px rgba(200,64,122,.2)}50%{box-shadow:0 4px 24px rgba(200,64,122,.5)}}
-.marco.locked{opacity:.4}
-.marco-icon{font-size:26px;margin-bottom:4px;display:block}
-.marco-house{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--txt3);margin-bottom:2px}
-.marco-name{font-size:10px;font-weight:700;line-height:1.2;color:var(--gd2)}
-.marco.won .marco-name{color:var(--gd3)}
+#loading.gone { opacity: 0; pointer-events: none; }
 
-/* ─── CODE BOX ─── */
-.code-section{
-  margin:14px 14px 0;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(200,64,122,.2);
-  border-radius:24px;padding:20px;
+.ld-ring {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  border: 2px solid rgba(200,146,42,.15);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  animation: ringPulse 2s ease-in-out infinite;
 }
-.code-row{display:flex;gap:8px}
-.code-inp{
-  flex:1;padding:15px 14px;
-  background:rgba(0,0,0,.35);
-  border:2px solid rgba(200,150,58,.3);
-  border-radius:14px;color:var(--txt);
-  font-family:'Nunito',sans-serif;
-  font-size:20px;font-weight:900;letter-spacing:6px;
-  text-transform:uppercase;text-align:center;-webkit-appearance:none;
-  transition:border-color .2s,box-shadow .2s;
+.ld-ring::before {
+  content: '';
+  position: absolute; inset: -8px; border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--gold2);
+  border-right-color: rgba(200,146,42,.3);
+  animation: spin 1.8s linear infinite;
 }
-.code-inp:focus{outline:none;border-color:var(--gd);
-  box-shadow:0 0 20px rgba(200,150,58,.25)}
-.code-inp::placeholder{font-size:13px;letter-spacing:2px;font-weight:400;opacity:.4}
-.btn-play{
-  padding:15px 20px;border:none;border-radius:14px;cursor:pointer;
-  background:linear-gradient(135deg,var(--pk2),var(--pk),#7a1035);
-  color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;
-  box-shadow:0 6px 24px rgba(200,64,122,.45);transition:all .25s;
-  white-space:nowrap;position:relative;overflow:hidden;
+.ld-ring::after {
+  content: '';
+  position: absolute; inset: -16px; border-radius: 50%;
+  border: 1px solid transparent;
+  border-bottom-color: var(--rose);
+  border-left-color: rgba(224,64,122,.3);
+  animation: spin 3s linear infinite reverse;
 }
-.btn-play::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.25),transparent 55%);border-radius:inherit}
-.btn-play:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(200,64,122,.6)}
-.btn-play:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.cfb{margin-top:12px;padding:12px 14px;border-radius:12px;
-  font-size:13px;font-weight:600;display:none;line-height:1.4}
-.cfb.err{background:rgba(200,64,122,.12);border:1px solid rgba(200,64,122,.28);color:#ffaac8;display:block}
-.cfb.ok{background:rgba(200,150,58,.1);border:1px solid rgba(200,150,58,.25);color:var(--gd2);display:block}
-
-/* ─── NAV ─── */
-.nav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;display:none;
-  background:rgba(13,4,22,.96);
-  border-top:1px solid rgba(200,64,122,.2);
-  backdrop-filter:blur(28px);z-index:100;
-  padding:6px 0 max(8px,env(safe-area-inset-bottom));
-  box-shadow:0 -20px 60px rgba(0,0,0,.5);
-}
-.nav-inner{display:flex;width:100%}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:7px 4px;background:none;border:none;color:var(--txt3);
-  font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;cursor:pointer;
-  transition:color .2s;letter-spacing:.3px}
-.nbtn.on{color:var(--pk2)}
-.nbtn-ic{font-size:22px;line-height:1}
-.nbtn.on .nbtn-ic{filter:drop-shadow(0 0 8px rgba(200,64,122,.7))}
-
-/* ─── HIST SCREEN ─── */
-.page-title{
-  font-family:'Playfair Display',serif;font-size:26px;font-weight:700;
-  font-style:italic;color:var(--gd2);text-align:center;padding:20px 16px 20px}
-.hist-item{display:flex;align-items:center;gap:12px;padding:13px 15px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
-  border-radius:16px;margin:0 14px 9px;transition:border-color .2s}
-.hist-item:hover{border-color:rgba(200,150,58,.25)}
-.hi-icon{font-size:22px;flex-shrink:0}
-.hi-info{flex:1}
-.hi-title{font-size:13px;font-weight:700}
-.hi-sub{font-size:11px;color:var(--txt2);margin-top:3px}
-.hi-badge{font-size:12px;font-weight:900;color:var(--gd);
-  background:rgba(200,150,58,.1);border:1px solid rgba(200,150,58,.22);
-  border-radius:8px;padding:4px 10px;white-space:nowrap}
-
-/* ─── ADMIN ─── */
-.admin-card{margin:0 14px 14px;background:rgba(255,255,255,.04);
-  border:1px solid rgba(200,150,58,.18);border-radius:24px;padding:22px}
-.admin-card h3{font-size:10px;font-weight:700;letter-spacing:2px;
-  text-transform:uppercase;color:var(--txt3);margin-bottom:18px}
-.irow{display:flex;gap:10px;margin-bottom:12px}
-.irow .fg{flex:1;margin-bottom:0}
-.btn-adm{padding:13px 18px;border:none;border-radius:12px;cursor:pointer;
-  background:linear-gradient(135deg,var(--gd3),var(--gd));color:var(--pu);
-  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;
-  box-shadow:0 4px 16px rgba(200,150,58,.3);transition:all .2s}
-.btn-adm:hover{transform:translateY(-1px)}
-.code-disp{display:none;margin-top:16px;padding:20px;text-align:center;
-  background:rgba(0,0,0,.35);border:2px solid var(--gd);border-radius:16px;
-  animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
-@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
-.code-disp .cv{font-size:30px;font-weight:900;letter-spacing:8px;
-  color:var(--gd2);font-family:'Nunito',sans-serif}
-.code-disp .ch{font-size:12px;color:var(--txt2);margin-top:8px;line-height:1.4}
-.ctable{width:100%;border-collapse:collapse;font-size:13px}
-.ctable th{text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--txt3);padding:8px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
-.ctable td{padding:11px 4px;border-bottom:1px solid rgba(255,255,255,.04)}
-.hb{display:inline-block;background:rgba(200,150,58,.14);border:1px solid rgba(200,150,58,.3);
-  border-radius:8px;padding:2px 9px;font-size:12px;font-weight:900;color:var(--gd)}
-.del-btn{background:rgba(200,150,58,.1);border:1px solid rgba(200,150,58,.25);
-  border-radius:8px;padding:6px 11px;color:var(--gd);font-size:11px;font-weight:700;
-  cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;transition:all .2s}
-.del-btn:hover{background:rgba(200,150,58,.2)}
-
-/* ─── MODAL PRÊMIO ─── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);
-  backdrop-filter:blur(14px);z-index:500;
-  display:flex;align-items:flex-end;justify-content:center;
-  padding:16px;opacity:0;pointer-events:none;transition:opacity .35s}
-.overlay.open{opacity:1;pointer-events:all}
-.mcard{width:100%;max-width:400px;
-  background:linear-gradient(160deg,#2d1255,#0d0416);
-  border:1px solid rgba(200,64,122,.4);border-radius:32px;
-  padding:34px 22px;text-align:center;
-  transform:translateY(50px) scale(.95);
-  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:0 -30px 80px rgba(200,64,122,.2),inset 0 1px 0 rgba(255,255,255,.08)}
-.overlay.open .mcard{transform:translateY(0) scale(1)}
-.m-firework{font-size:70px;display:block;margin-bottom:14px;
-  animation:crownFloat 2s ease-in-out infinite}
-.m-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;
-  font-style:italic;color:var(--gd2);margin-bottom:6px}
-.m-sub{font-size:14px;color:var(--txt2);margin-bottom:22px;line-height:1.5}
-.prize-reveal{background:rgba(200,150,58,.1);border:1px solid rgba(200,150,58,.25);
-  border-radius:20px;padding:20px;margin-bottom:10px}
-.pr-icon{font-size:52px;display:block;margin-bottom:10px}
-.pr-casa{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:4px}
-.pr-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gd);margin-bottom:4px}
-.pr-desc{font-size:13px;color:var(--txt2);line-height:1.5}
-.btn-close{width:100%;margin-top:18px;padding:16px;border:none;border-radius:16px;cursor:pointer;
-  background:linear-gradient(135deg,var(--gd3),var(--gd2));
-  color:var(--pu);font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
-  box-shadow:0 6px 24px rgba(200,150,58,.35)}
-
-/* ─── CONFETE ─── */
-.cf{position:fixed;pointer-events:none;z-index:600;font-size:24px;
-  animation:cfFall var(--d,2s) ease-in forwards}
-@keyframes cfFall{
-  0%{transform:translateY(-30px) rotate(0deg);opacity:1}
-  100%{transform:translateY(110vh) rotate(760deg);opacity:0}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes ringPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(200,146,42,.1); }
+  50%      { box-shadow: 0 0 40px rgba(200,146,42,.3); }
 }
 
-/* ─── UTILS ─── */
-.empty{text-align:center;padding:40px 20px;color:var(--txt2)}
-.empty .ei{font-size:48px;display:block;margin-bottom:12px}
-.empty p{font-size:14px;line-height:1.6}
+.ld-gem { font-size: 52px; filter: drop-shadow(0 0 20px rgba(200,146,42,.8)); animation: gemBounce 2s ease-in-out infinite; }
+@keyframes gemBounce {
+  0%,100% { transform: translateY(0)   scale(1); }
+  50%      { transform: translateY(-6px) scale(1.08); }
+}
+.ld-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 50px; font-weight: 700;
+  letter-spacing: 7px; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--cream), var(--gold2), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-top: 18px; line-height: 1;
+}
+.ld-sub { font-size: 11px; letter-spacing: 4px; color: var(--t3); text-transform: uppercase; margin-top: 8px; }
+.ld-dots { display: flex; gap: 8px; margin-top: 30px; }
+.ld-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  animation: dotBop .9s ease-in-out infinite;
+}
+.ld-dot:nth-child(1) { background: var(--rose);  animation-delay: 0s; }
+.ld-dot:nth-child(2) { background: var(--gold2); animation-delay: .15s; }
+.ld-dot:nth-child(3) { background: var(--rose2); animation-delay: .30s; }
+@keyframes dotBop { 0%,100%{transform:scale(.6);opacity:.4} 50%{transform:scale(1.4);opacity:1} }
 
-/* ─── ANIMAÇÃO DE AVANÇO ─── */
-@keyframes housePulse{
-  0%{transform:scale(1)}
-  40%{transform:scale(1.3)}
-  70%{transform:scale(.95)}
-  100%{transform:scale(1)}
+/* ════════════════════════════════════════════
+   SCREENS
+════════════════════════════════════════════ */
+.screen { display: none; min-height: 100vh; padding-bottom: 95px; }
+.screen.active { display: block; animation: screenIn .35s cubic-bezier(.4,0,.2,1); }
+@keyframes screenIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ════════════════════════════════════════════
+   AUTH SCREEN
+════════════════════════════════════════════ */
+#screen-auth {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 22px; min-height: 100vh;
+}
+
+.auth-hero { text-align: center; margin-bottom: 40px; }
+
+.auth-logo-ring {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, var(--bg4), var(--wine));
+  border: 2px solid var(--b2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(200,146,42,.2), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.auth-logo-ring::before {
+  content: '';
+  position: absolute; inset: -4px; border-radius: 50%;
+  border: 1px solid transparent;
+  border-top-color: rgba(200,146,42,.5);
+  animation: spin 4s linear infinite;
+}
+.auth-logo-gem { font-size: 50px; filter: drop-shadow(0 0 16px rgba(200,146,42,.7)); animation: gemBounce 3s ease-in-out infinite; }
+
+.auth-brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px; font-weight: 700;
+  letter-spacing: 6px; text-transform: uppercase;
+  background: linear-gradient(150deg, var(--cream) 0%, var(--gold3) 40%, var(--gold) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+.auth-brand-sub { font-size: 11px; letter-spacing: 3.5px; color: var(--t3); text-transform: uppercase; margin-top: 8px; }
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 14px; color: rgba(200,146,42,.4); font-size: 13px; letter-spacing: 8px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,.25), transparent);
+}
+
+/* Card de auth */
+.auth-surface {
+  width: 100%;
+  background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border: 1px solid var(--b2);
+  border-radius: var(--r4);
+  padding: 28px 22px;
+  backdrop-filter: blur(40px);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.6),
+    0 0 0 1px rgba(255,255,255,.04) inset,
+    0 1px 0 rgba(255,255,255,.1) inset;
+}
+
+.auth-tabs {
+  display: flex;
+  background: rgba(0,0,0,.4);
+  border-radius: var(--r2); padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,.05);
+}
+.tab {
+  flex: 1; padding: 11px; border: none;
+  background: transparent; color: var(--t3);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px; font-weight: 800;
+  cursor: pointer; border-radius: 14px;
+  transition: all .25s; letter-spacing: .3px;
+}
+.tab.on {
+  background: linear-gradient(135deg, var(--ruby2), var(--wine));
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(155,25,66,.5);
+}
+
+.fg { margin-bottom: 14px; }
+.fg label { display: block; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--t3); margin-bottom: 6px; }
+.inp {
+  width: 100%; padding: 13px 16px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid var(--b1);
+  border-radius: var(--r1);
+  color: var(--t1);
+  font-family: 'Nunito', sans-serif; font-size: 15px;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+  -webkit-appearance: none;
+}
+.inp:focus {
+  outline: none;
+  border-color: var(--gold2);
+  background: rgba(255,255,255,.06);
+  box-shadow: 0 0 0 3px rgba(200,146,42,.12);
+}
+.inp::placeholder { color: rgba(255,255,255,.18); }
+
+.btn-gold {
+  width: 100%; padding: 16px; border: none;
+  border-radius: var(--r2); cursor: pointer;
+  background: linear-gradient(135deg, var(--cream), var(--gold3), var(--gold2), var(--gold));
+  color: var(--wine); font-family: 'Nunito', sans-serif;
+  font-size: 16px; font-weight: 900; letter-spacing: .3px;
+  box-shadow: var(--sgold), inset 0 1px 0 rgba(255,255,255,.4);
+  transition: all .25s; position: relative; overflow: hidden;
+}
+.btn-gold::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.4) 0%, transparent 60%);
+  border-radius: inherit;
+}
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(200,146,42,.55), inset 0 1px 0 rgba(255,255,255,.4); }
+.btn-gold:active { transform: translateY(0); }
+.btn-gold:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+.amsg { margin-top: 12px; padding: 12px 15px; border-radius: var(--r1); font-size: 13px; font-weight: 600; display: none; line-height: 1.4; }
+.amsg.err { background: rgba(155,25,66,.14); border: 1px solid rgba(155,25,66,.3); color: #ffaac8; display: block; }
+.amsg.ok  { background: rgba(200,146,42,.12); border: 1px solid rgba(200,146,42,.28); color: var(--gold3); display: block; }
+
+/* ════════════════════════════════════════════
+   TOPBAR (cabeçalho da jogadora)
+════════════════════════════════════════════ */
+.topbar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 10px;
+  position: relative;
+}
+/* linha de brilho dourado no topo */
+.topbar::after {
+  content: '';
+  position: absolute; bottom: 0; left: 16px; right: 16px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,.2), transparent);
+}
+
+.user-pill { display: flex; align-items: center; gap: 10px; }
+
+/* Avatar com anel duplo */
+.ava-wrap { position: relative; flex-shrink: 0; }
+.ava {
+  width: 46px; height: 46px; border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--gold2);
+  box-shadow: 0 0 16px rgba(200,146,42,.4), 0 0 0 4px rgba(200,146,42,.08);
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--ruby), var(--bg4));
+  font-size: 20px;
+}
+.ava svg { width: 100%; height: 100%; }
+/* Indicador online */
+.ava-dot {
+  position: absolute; bottom: 1px; right: 1px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: #4ade80; border: 2px solid var(--bg);
+  box-shadow: 0 0 8px rgba(74,222,128,.5);
+}
+
+.uname { font-size: 15px; font-weight: 800; line-height: 1.2; color: var(--t1); }
+.usub  { font-size: 11px; color: var(--t2); margin-top: 1px; }
+
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.coin-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: linear-gradient(135deg, rgba(200,146,42,.12), rgba(200,146,42,.06));
+  border: 1px solid var(--b2);
+  border-radius: 20px; padding: 6px 12px;
+  font-size: 13px; font-weight: 800; color: var(--gold3);
+  box-shadow: 0 2px 12px rgba(200,146,42,.15);
+}
+.btn-sair {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px; padding: 7px 12px;
+  color: var(--t3); font-size: 11px; font-weight: 700;
+  cursor: pointer; font-family: 'Nunito', sans-serif;
+  transition: all .2s;
+}
+.btn-sair:hover { border-color: var(--b1); color: var(--t2); }
+
+/* ════════════════════════════════════════════
+   SEASON HERO BANNER
+════════════════════════════════════════════ */
+.season-hero {
+  margin: 12px 14px 0;
+  border-radius: var(--r3);
+  overflow: hidden;
+  position: relative;
+  padding: 22px 18px 18px;
+  background:
+    linear-gradient(160deg, rgba(155,25,66,.40) 0%, rgba(74,8,32,.85) 100%);
+  border: 1px solid rgba(224,64,122,.25);
+  box-shadow: 0 8px 32px rgba(155,25,66,.25), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* Textura de losangos */
+.season-hero::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 2 L38 20 L20 38 L2 20 Z' fill='none' stroke='rgba(200%2C146%2C42%2C0.06)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* Linha de brilho topo */
+.season-hero::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(224,64,122,.6) 50%, transparent 100%);
+}
+
+/* Faixas decorativas */
+.sh-deco-l {
+  position: absolute; left: -20px; top: 50%; transform: translateY(-50%);
+  width: 60px; height: 60px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,146,42,.15), transparent);
+  filter: blur(10px);
+}
+.sh-deco-r {
+  position: absolute; right: -10px; bottom: -10px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,64,122,.2), transparent);
+  filter: blur(14px);
+}
+
+.s-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--blush); font-weight: 700; margin-bottom: 8px;
+}
+.s-eyebrow-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--rose); animation: dotBop 1.5s ease-in-out infinite; }
+
+.s-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 700; font-style: italic;
+  color: #fff; margin-bottom: 14px;
+  text-shadow: 0 0 24px rgba(224,64,122,.4);
+}
+
+.s-progress-wrap { display: flex; align-items: center; gap: 10px; }
+.s-bar {
+  flex: 1; height: 7px;
+  background: rgba(0,0,0,.3);
+  border-radius: 4px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.05);
+}
+.s-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--ruby2), var(--rose2), var(--gold2));
+  background-size: 200% 100%;
+  animation: barShimmer 3s linear infinite;
+  box-shadow: 0 0 10px rgba(224,64,122,.6);
+  transition: width 1.4s cubic-bezier(.4,0,.2,1);
+}
+@keyframes barShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.s-txt { font-size: 13px; font-weight: 900; color: var(--gold3); white-space: nowrap; }
+
+/* ════════════════════════════════════════════
+   TABULEIRO CANVAS
+════════════════════════════════════════════ */
+.board-section {
+  margin: 14px 14px 0;
+  border-radius: var(--r3);
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(160deg, rgba(42,14,72,.8), rgba(10,1,20,.9));
+  border: 1px solid rgba(200,146,42,.12);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 0 40px rgba(155,25,66,.06);
+}
+.board-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(155,25,66,.08), transparent),
+    radial-gradient(ellipse 40% 30% at 50% 10%, rgba(200,146,42,.05), transparent);
+  pointer-events: none;
+}
+
+#game-canvas { display: block; width: 100%; position: relative; z-index: 1; }
+
+/* ════════════════════════════════════════════
+   PRÓXIMO PRÊMIO
+════════════════════════════════════════════ */
+.next-prize-bar {
+  display: flex; align-items: center; gap: 14px;
+  margin: 12px 14px 0;
+  background: linear-gradient(135deg, rgba(200,146,42,.1), rgba(200,146,42,.04));
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  padding: 14px 16px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(200,146,42,.1);
+}
+.next-prize-bar::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--gold3), var(--gold));
+  border-radius: 3px 0 0 3px;
+}
+.np-icon { font-size: 32px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(200,146,42,.5)); }
+.np-info { flex: 1; }
+.np-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--t3); font-weight: 800; }
+.np-name  { font-size: 15px; font-weight: 800; color: var(--gold3); margin-top: 3px; }
+.np-dist  { font-size: 11px; color: var(--t2); margin-top: 2px; }
+.np-arrow { font-size: 18px; color: var(--gold); opacity: .5; }
+
+/* ════════════════════════════════════════════
+   MARCOS DE CONQUISTA
+════════════════════════════════════════════ */
+.marcos-section { margin: 16px 14px 0; }
+
+.sec-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--t3);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(200,146,42,.2), transparent);
+}
+
+.marcos-strip {
+  display: flex; gap: 9px;
+  overflow-x: auto; padding: 4px 2px;
+  scrollbar-width: none;
+}
+.marcos-strip::-webkit-scrollbar { display: none; }
+
+.marco {
+  flex: 0 0 82px;
+  border-radius: var(--r2);
+  padding: 14px 8px 12px;
+  text-align: center;
+  border: 1px solid transparent;
+  background: var(--g1);
+  transition: all .25s;
+  position: relative; overflow: hidden;
+  cursor: default;
+}
+
+/* Efeito de brilho interno */
+.marco::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: transparent;
+  transition: background .25s;
+}
+
+.marco.won {
+  background: linear-gradient(160deg, rgba(200,146,42,.18), rgba(138,98,34,.08));
+  border-color: rgba(200,146,42,.4);
+  box-shadow: 0 4px 20px rgba(200,146,42,.15), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.marco.won::before { background: linear-gradient(90deg, transparent, rgba(200,146,42,.4), transparent); }
+
+.marco.next {
+  background: linear-gradient(160deg, rgba(224,64,122,.18), rgba(155,25,66,.08));
+  border-color: rgba(224,64,122,.45);
+  box-shadow: 0 4px 24px rgba(224,64,122,.2), inset 0 1px 0 rgba(255,255,255,.06);
+  animation: marcoNextPulse 2.5s ease-in-out infinite;
+}
+.marco.next::before { background: linear-gradient(90deg, transparent, rgba(224,64,122,.5), transparent); }
+
+@keyframes marcoNextPulse {
+  0%,100% { box-shadow: 0 4px 20px rgba(224,64,122,.2), inset 0 1px 0 rgba(255,255,255,.06); }
+  50%      { box-shadow: 0 4px 32px rgba(224,64,122,.45), inset 0 1px 0 rgba(255,255,255,.06); }
+}
+.marco.locked { opacity: .35; }
+
+.marco-icon  { font-size: 28px; display: block; margin-bottom: 5px; }
+.marco-house { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--t3); margin-bottom: 3px; }
+.marco-name  { font-size: 10px; font-weight: 800; line-height: 1.3; color: var(--gold3); }
+.marco.won .marco-name { color: var(--cream); }
+.marco.next .marco-name { color: var(--blush); }
+
+/* ════════════════════════════════════════════
+   CÓDIGO DE COMPRA
+════════════════════════════════════════════ */
+.code-section {
+  margin: 16px 14px 0;
+  background: linear-gradient(160deg, var(--g2), var(--g1));
+  border: 1px solid var(--b3);
+  border-radius: var(--r3);
+  padding: 20px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(155,25,66,.1), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.code-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(224,64,122,.4), transparent);
+}
+
+.code-row { display: flex; gap: 9px; }
+
+.code-inp {
+  flex: 1; padding: 15px 14px;
+  background: rgba(0,0,0,.4);
+  border: 2px solid var(--b2);
+  border-radius: var(--r2);
+  color: var(--t1);
+  font-family: 'Nunito', sans-serif;
+  font-size: 21px; font-weight: 900;
+  letter-spacing: 7px; text-transform: uppercase; text-align: center;
+  -webkit-appearance: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.code-inp:focus {
+  outline: none;
+  border-color: var(--gold2);
+  box-shadow: 0 0 0 3px rgba(200,146,42,.15), 0 0 24px rgba(200,146,42,.2);
+}
+.code-inp::placeholder { font-size: 13px; letter-spacing: 3px; font-weight: 500; opacity: .35; }
+
+.btn-play {
+  padding: 15px 20px; border: none;
+  border-radius: var(--r2); cursor: pointer;
+  background: linear-gradient(135deg, var(--rose2), var(--rose), var(--ruby2));
+  color: #fff; font-family: 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 900;
+  box-shadow: var(--srose), inset 0 1px 0 rgba(255,255,255,.2);
+  transition: all .25s; white-space: nowrap;
+  position: relative; overflow: hidden;
+}
+.btn-play::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.25) 0%, transparent 60%);
+  border-radius: inherit;
+}
+.btn-play:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(224,64,122,.55), inset 0 1px 0 rgba(255,255,255,.2); }
+.btn-play:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+.cfb { margin-top: 12px; padding: 12px 15px; border-radius: var(--r1); font-size: 13px; font-weight: 600; display: none; line-height: 1.4; }
+.cfb.err { background: rgba(155,25,66,.14); border: 1px solid rgba(155,25,66,.3); color: #ffaac8; display: block; }
+.cfb.ok  { background: rgba(200,146,42,.1); border: 1px solid rgba(200,146,42,.25); color: var(--gold3); display: block; }
+
+/* ════════════════════════════════════════════
+   BOTTOM NAV
+════════════════════════════════════════════ */
+.nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  display: none;
+  background: rgba(10,1,20,.97);
+  backdrop-filter: blur(32px);
+  z-index: 200;
+  padding: 6px 8px max(10px, env(safe-area-inset-bottom));
+  box-shadow: 0 -1px 0 rgba(200,146,42,.1), 0 -20px 60px rgba(0,0,0,.6);
+}
+
+.nav-inner { display: flex; width: 100%; gap: 4px; }
+
+.nbtn {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  padding: 8px 4px; background: none; border: none;
+  color: var(--t4); font-family: 'Nunito', sans-serif;
+  font-size: 10px; font-weight: 700; cursor: pointer;
+  letter-spacing: .3px; border-radius: var(--r1);
+  transition: all .2s; position: relative;
+}
+.nbtn.on {
+  color: var(--rose2);
+  background: rgba(224,64,122,.08);
+}
+.nbtn.on::before {
+  content: '';
+  position: absolute; top: 0; left: 20%; right: 20%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--rose2), transparent);
+  border-radius: 0 0 2px 2px;
+}
+.nbtn-ic { font-size: 22px; line-height: 1; transition: filter .2s; }
+.nbtn.on .nbtn-ic { filter: drop-shadow(0 0 8px rgba(224,64,122,.8)); }
+
+/* ════════════════════════════════════════════
+   HISTÓRICO
+════════════════════════════════════════════ */
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 700; font-style: italic;
+  text-align: center; padding: 22px 16px 20px;
+  background: linear-gradient(135deg, var(--gold3), var(--gold2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.hist-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--g1);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: var(--r2);
+  margin: 0 14px 9px;
+  transition: border-color .2s, background .2s;
+}
+.hist-item:hover { border-color: var(--b1); background: var(--g2); }
+.hi-icon  { font-size: 24px; flex-shrink: 0; }
+.hi-info  { flex: 1; }
+.hi-title { font-size: 13px; font-weight: 700; }
+.hi-sub   { font-size: 11px; color: var(--t2); margin-top: 3px; line-height: 1.4; }
+.hi-badge {
+  font-size: 12px; font-weight: 900; color: var(--gold2);
+  background: rgba(200,146,42,.1);
+  border: 1px solid rgba(200,146,42,.2);
+  border-radius: 8px; padding: 4px 10px; white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════
+   ADMIN
+════════════════════════════════════════════ */
+.admin-card {
+  margin: 0 14px 14px;
+  background: var(--g1);
+  border: 1px solid var(--b1);
+  border-radius: var(--r3);
+  padding: 22px;
+}
+.admin-card h3 {
+  font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--t3); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.admin-card h3::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.06); }
+
+.irow { display: flex; gap: 10px; margin-bottom: 12px; }
+.irow .fg { flex: 1; margin-bottom: 0; }
+
+.btn-adm {
+  padding: 13px 18px; border: none; border-radius: var(--r1); cursor: pointer;
+  background: linear-gradient(135deg, var(--cream), var(--gold3), var(--gold));
+  color: var(--wine); font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 900;
+  box-shadow: var(--sgold); transition: all .2s;
+  position: relative; overflow: hidden;
+}
+.btn-adm::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.3) 0%, transparent 60%);
+}
+.btn-adm:hover { transform: translateY(-1px); }
+
+.code-disp {
+  display: none; margin-top: 16px;
+  padding: 22px; text-align: center;
+  background: rgba(0,0,0,.4);
+  border: 2px solid var(--gold2); border-radius: var(--r2);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 0 30px rgba(200,146,42,.2);
+}
+@keyframes popIn { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.code-disp .cv {
+  font-size: 32px; font-weight: 900; letter-spacing: 9px;
+  color: var(--gold3); font-family: 'Nunito', sans-serif;
+  text-shadow: 0 0 20px rgba(200,146,42,.5);
+}
+.code-disp .ch { font-size: 12px; color: var(--t2); margin-top: 8px; line-height: 1.4; }
+
+.ctable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ctable th {
+  text-align: left; font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--t3);
+  padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.ctable td { padding: 11px 4px; border-bottom: 1px solid rgba(255,255,255,.03); }
+.hb {
+  display: inline-block;
+  background: rgba(200,146,42,.14); border: 1px solid rgba(200,146,42,.28);
+  border-radius: 8px; padding: 2px 9px;
+  font-size: 12px; font-weight: 900; color: var(--gold2);
+}
+.del-btn {
+  background: rgba(200,146,42,.1); border: 1px solid rgba(200,146,42,.22);
+  border-radius: 8px; padding: 6px 11px;
+  color: var(--gold2); font-size: 11px; font-weight: 700;
+  cursor: pointer; font-family: 'Nunito', sans-serif;
+  white-space: nowrap; transition: all .2s;
+}
+.del-btn:hover { background: rgba(200,146,42,.2); }
+
+/* ════════════════════════════════════════════
+   MODAL DE PRÊMIO
+════════════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.92);
+  backdrop-filter: blur(16px);
+  z-index: 500;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.mcard {
+  width: 100%; max-width: 400px;
+  background: linear-gradient(160deg, #2d0e50, #0a0114);
+  border: 1px solid rgba(224,64,122,.5);
+  border-radius: var(--r4);
+  padding: 36px 24px;
+  text-align: center;
+  transform: translateY(60px) scale(.93);
+  transition: transform .45s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:
+    0 -40px 100px rgba(155,25,66,.25),
+    0 0 0 1px rgba(255,255,255,.05) inset,
+    0 1px 0 rgba(255,255,255,.1) inset;
+  position: relative; overflow: hidden;
+}
+.mcard::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(224,64,122,.7), transparent);
+}
+.overlay.open .mcard { transform: translateY(0) scale(1); }
+
+/* Brilho de fundo no modal */
+.mcard-glow {
+  position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,64,122,.2), transparent 70%);
+  pointer-events: none;
+}
+
+.m-firework { font-size: 72px; display: block; margin-bottom: 14px; animation: gemBounce 2s ease-in-out infinite; }
+.m-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px; font-weight: 700; font-style: italic;
+  color: var(--gold3); margin-bottom: 6px;
+}
+.m-sub { font-size: 14px; color: var(--t2); margin-bottom: 24px; line-height: 1.5; }
+
+.prize-reveal {
+  background: linear-gradient(160deg, rgba(200,146,42,.12), rgba(200,146,42,.04));
+  border: 1px solid rgba(200,146,42,.28);
+  border-radius: var(--r2);
+  padding: 22px 18px; margin-bottom: 10px;
+  position: relative; overflow: hidden;
+}
+.prize-reveal::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,.5), transparent);
+}
+.pr-icon { font-size: 56px; display: block; margin-bottom: 10px; filter: drop-shadow(0 0 12px rgba(200,146,42,.5)); }
+.pr-casa { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--t3); margin-bottom: 5px; }
+.pr-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--gold2); margin-bottom: 5px;
+}
+.pr-desc { font-size: 13px; color: var(--t2); line-height: 1.5; }
+
+.btn-close {
+  width: 100%; margin-top: 20px; padding: 17px; border: none;
+  border-radius: var(--r2); cursor: pointer;
+  background: linear-gradient(135deg, var(--cream), var(--gold3), var(--gold2));
+  color: var(--wine); font-family: 'Nunito', sans-serif;
+  font-size: 17px; font-weight: 900;
+  box-shadow: var(--sgold), inset 0 1px 0 rgba(255,255,255,.4);
+  position: relative; overflow: hidden;
+}
+.btn-close::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.35) 0%, transparent 60%);
+}
+
+/* ════════════════════════════════════════════
+   CONFETE
+════════════════════════════════════════════ */
+.cf {
+  position: fixed; pointer-events: none; z-index: 600;
+  font-size: 26px;
+  animation: cfFall var(--d, 2s) ease-in forwards;
+}
+@keyframes cfFall {
+  0%   { transform: translateY(-30px) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(115vh) rotate(760deg) scale(.7); opacity: 0; }
+}
+
+/* ════════════════════════════════════════════
+   UTILITÁRIOS
+════════════════════════════════════════════ */
+.empty { text-align: center; padding: 40px 20px; color: var(--t2); }
+.empty .ei { font-size: 48px; display: block; margin-bottom: 14px; }
+.empty p { font-size: 14px; line-height: 1.6; }
+
+/* ════════════════════════════════════════════
+   LOBBY — Tela de boas-vindas (sempre ao logar)
+════════════════════════════════════════════ */
+#screen-lobby { display: none; min-height: 100vh; padding-bottom: 0; position: relative; overflow: hidden; }
+#screen-lobby.active { display: block; animation: screenIn .35s cubic-bezier(.4,0,.2,1); }
+
+.lobby-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 180% 90% at 50% 0%,   #5a0878 0%, transparent 52%),
+    radial-gradient(ellipse 100% 60% at 0%   80%, #3a0828 0%, transparent 50%),
+    radial-gradient(ellipse 80%  50% at 100% 20%, #220540 0%, transparent 50%),
+    radial-gradient(ellipse 100% 40% at 50% 100%, #1a0230 0%, transparent 60%);
+}
+.lobby-bg::after {
+  content: '';
+  position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+  width: 340px; height: 340px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,146,42,.10) 0%, transparent 70%);
+  filter: blur(40px); pointer-events: none;
+}
+
+.lobby-inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; min-height: 100vh;
+  padding: 0 22px 40px;
+}
+
+.lobby-header {
+  width: 100%; display: flex; align-items: center;
+  justify-content: flex-end; padding: 16px 0 0;
+}
+.lobby-btn-sair {
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px; padding: 7px 14px; color: var(--t3);
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  font-family: 'Nunito', sans-serif; transition: all .2s;
+}
+.lobby-btn-sair:hover { border-color: var(--b1); color: var(--t2); }
+
+/* Avatar grande com anéis */
+.lobby-logo-area { display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
+.lobby-avatar-ring { position: relative; width: 120px; height: 120px; }
+.lobby-avatar-ring::before {
+  content: ''; position: absolute; inset: -8px; border-radius: 50%;
+  border: 2px solid transparent; border-top-color: var(--gold2);
+  border-right-color: rgba(200,146,42,.25); animation: spin 3s linear infinite;
+}
+.lobby-avatar-ring::after {
+  content: ''; position: absolute; inset: -16px; border-radius: 50%;
+  border: 1.5px solid transparent; border-bottom-color: var(--rose);
+  border-left-color: rgba(224,64,122,.2); animation: spin 5s linear infinite reverse;
+}
+.lobby-avatar-circle {
+  width: 120px; height: 120px; border-radius: 50%; overflow: hidden;
+  border: 3px solid var(--gold2);
+  box-shadow: 0 0 0 6px rgba(200,146,42,.1), 0 0 40px rgba(200,146,42,.35), 0 0 80px rgba(155,25,66,.2);
+  animation: avatarPulse 3s ease-in-out infinite;
+}
+@keyframes avatarPulse {
+  0%,100% { box-shadow: 0 0 0 6px rgba(200,146,42,.1), 0 0 40px rgba(200,146,42,.35), 0 0 80px rgba(155,25,66,.2); }
+  50%      { box-shadow: 0 0 0 9px rgba(200,146,42,.15), 0 0 60px rgba(200,146,42,.5), 0 0 100px rgba(155,25,66,.3); }
+}
+.lobby-avatar-circle svg { width: 100%; height: 100%; }
+
+.lobby-taina-name {
+  font-size: 11px; color: var(--gold2); letter-spacing: 2px;
+  text-transform: uppercase; font-weight: 700; margin-top: 8px; text-align: center;
+}
+
+.lobby-game-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px; font-weight: 700; letter-spacing: 6px; text-transform: uppercase;
+  background: linear-gradient(150deg, var(--cream) 0%, var(--gold3) 35%, var(--gold2) 65%, var(--gold) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-top: 14px; line-height: 1; text-align: center;
+  filter: drop-shadow(0 0 20px rgba(200,146,42,.4));
+}
+.lobby-game-sub { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--t3); margin-top: 6px; text-align: center; }
+.lobby-deco {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 10px; color: rgba(200,146,42,.35); font-size: 12px; letter-spacing: 6px;
+}
+.lobby-deco::before { content: ''; width: 40px; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,146,42,.3)); }
+.lobby-deco::after  { content: ''; width: 40px; height: 1px; background: linear-gradient(270deg, transparent, rgba(200,146,42,.3)); }
+
+/* Card de boas-vindas */
+.lobby-welcome-card {
+  width: 100%; margin-top: 20px;
+  background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  border: 1px solid rgba(200,146,42,.22); border-radius: var(--r3);
+  padding: 20px; position: relative; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.lobby-welcome-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,.5), transparent);
+}
+.lobby-hi { font-size: 13px; color: var(--t2); }
+.lobby-hi strong { font-size: 22px; font-weight: 900; color: var(--t1); display: block; margin-top: 2px; }
+
+.lobby-status-row { display: flex; gap: 10px; margin-top: 16px; }
+.lobby-stat {
+  flex: 1; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--r2); padding: 12px 8px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.lobby-stat::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,.2), transparent);
+}
+.lobby-stat-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.lobby-stat-val  { font-size: 20px; font-weight: 900; color: var(--gold3); line-height: 1; }
+.lobby-stat-lbl  { font-size: 10px; color: var(--t3); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* Próximo prêmio no lobby */
+.lobby-next-prize {
+  display: flex; align-items: center; gap: 12px; margin-top: 12px;
+  background: linear-gradient(135deg, rgba(155,25,66,.2), rgba(74,8,32,.3));
+  border: 1px solid rgba(224,64,122,.25); border-radius: var(--r2);
+  padding: 12px 14px; position: relative; overflow: hidden;
+}
+.lobby-next-prize::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--rose2), var(--ruby));
+}
+.lnp-icon  { font-size: 28px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(224,64,122,.5)); }
+.lnp-info  { flex: 1; }
+.lnp-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--t3); font-weight: 800; }
+.lnp-name  { font-size: 14px; font-weight: 800; color: var(--blush); margin-top: 3px; }
+.lnp-dist  { font-size: 11px; color: var(--t2); margin-top: 2px; }
+
+/* Botão Jogar */
+.lobby-play-btn {
+  width: 100%; margin-top: 20px; padding: 20px; border: none;
+  border-radius: var(--r3); cursor: pointer; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--cream), var(--gold3), var(--gold2), var(--gold));
+  color: var(--wine); font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 700; letter-spacing: 2px;
+  box-shadow: var(--sgold), 0 0 0 1px rgba(255,255,255,.2) inset, 0 2px 0 rgba(255,255,255,.4) inset;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  animation: playGlow 2.5s ease-in-out infinite;
+}
+@keyframes playGlow {
+  0%,100% { box-shadow: var(--sgold), 0 0 0 1px rgba(255,255,255,.2) inset, 0 2px 0 rgba(255,255,255,.4) inset; }
+  50%      { box-shadow: 0 12px 50px rgba(200,146,42,.65), 0 0 0 1px rgba(255,255,255,.2) inset, 0 2px 0 rgba(255,255,255,.4) inset; }
+}
+.lobby-play-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.45) 0%, transparent 55%); border-radius: inherit; }
+.lobby-play-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 20px 60px rgba(200,146,42,.7), 0 0 0 1px rgba(255,255,255,.2) inset, 0 2px 0 rgba(255,255,255,.4) inset; }
+.lobby-play-btn:active { transform: translateY(0) scale(.99); }
+
+.lobby-how-btn {
+  margin-top: 12px; width: 100%; padding: 14px;
+  border: 1px solid rgba(255,255,255,.1); border-radius: var(--r2);
+  background: rgba(255,255,255,.04); color: var(--t2);
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .2s; letter-spacing: .3px;
+}
+.lobby-how-btn:hover { border-color: var(--b1); background: rgba(255,255,255,.07); color: var(--t1); }
+
+.lobby-footer { margin-top: 18px; text-align: center; font-size: 11px; color: var(--t4); letter-spacing: 1px; }
+
+/* ════════════════════════════════════════════
+   MODAL COMO FUNCIONA (Regras)
+════════════════════════════════════════════ */
+#modal-rules {
+  position: fixed; inset: 0; background: rgba(0,0,0,.92);
+  backdrop-filter: blur(16px); z-index: 600;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px; opacity: 0; pointer-events: none; transition: opacity .35s;
+}
+#modal-rules.open { opacity: 1; pointer-events: all; }
+
+.rules-card {
+  width: 100%; max-width: 420px;
+  background: linear-gradient(160deg, #1e0835, #0a0114);
+  border: 1px solid rgba(200,146,42,.28); border-radius: var(--r4);
+  max-height: 88vh; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: rgba(200,146,42,.2) transparent;
+  transform: translateY(60px); transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 -40px 80px rgba(155,25,66,.2), inset 0 1px 0 rgba(255,255,255,.07);
+}
+#modal-rules.open .rules-card { transform: translateY(0); }
+.rules-card::-webkit-scrollbar { width: 4px; }
+.rules-card::-webkit-scrollbar-thumb { background: rgba(200,146,42,.2); border-radius: 2px; }
+
+.rules-header {
+  position: sticky; top: 0; z-index: 1;
+  background: linear-gradient(160deg, #1e0835, #120220);
+  padding: 24px 24px 16px; border-bottom: 1px solid rgba(200,146,42,.1); text-align: center;
+  position: relative;
+}
+.rules-header::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,.5), transparent);
+}
+.rules-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; font-style: italic; color: var(--gold3); margin-bottom: 4px; }
+.rules-subtitle { font-size: 12px; color: var(--t3); letter-spacing: 1px; }
+.rules-close-btn {
+  position: absolute; top: 18px; right: 20px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+  color: var(--t2); font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.rules-close-btn:hover { background: rgba(255,255,255,.12); color: var(--t1); }
+
+.rules-body { padding: 20px 22px 28px; }
+
+.rules-step {
+  display: flex; gap: 14px; align-items: flex-start;
+  margin-bottom: 18px; padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.rules-step:last-of-type { border-bottom: none; margin-bottom: 0; }
+.rules-step-num {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--ruby2), var(--wine));
+  border: 1px solid rgba(224,64,122,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 900; color: #fff;
+  box-shadow: 0 4px 12px rgba(155,25,66,.3);
+}
+.rules-step-text { flex: 1; }
+.rules-step-title { font-size: 14px; font-weight: 800; color: var(--t1); margin-bottom: 4px; }
+.rules-step-desc  { font-size: 13px; color: var(--t2); line-height: 1.55; }
+
+.rules-prizes-box {
+  background: rgba(200,146,42,.07); border: 1px solid rgba(200,146,42,.18);
+  border-radius: var(--r2); padding: 16px; margin: 16px 0;
+}
+.rules-prizes-title {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold2); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.rules-prizes-title::after { content: ''; flex: 1; height: 1px; background: rgba(200,146,42,.2); }
+.prize-type-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.prize-type-row:last-child { margin-bottom: 0; }
+.prize-type-icon { font-size: 22px; flex-shrink: 0; }
+.prize-type-name { font-size: 13px; font-weight: 700; color: var(--t1); }
+.prize-type-desc { font-size: 11px; color: var(--t2); margin-top: 1px; }
+
+.rules-note {
+  background: rgba(224,64,122,.07); border: 1px solid rgba(224,64,122,.18);
+  border-radius: var(--r2); padding: 14px 16px; margin-top: 16px;
+  font-size: 13px; color: var(--t2); line-height: 1.55;
+}
+.rules-note strong { color: var(--blush); }
+
+.rules-cta-btn {
+  width: 100%; margin-top: 20px; padding: 16px; border: none;
+  border-radius: var(--r2); cursor: pointer;
+  background: linear-gradient(135deg, var(--cream), var(--gold3), var(--gold));
+  color: var(--wine); font-family: 'Nunito', sans-serif;
+  font-size: 16px; font-weight: 900; box-shadow: var(--sgold);
 }
 </style>
 </head>
 <body>
 
+<!-- Camadas de fundo -->
+<div id="bg-layer"></div>
 <div id="particles"></div>
 
-<!-- LOADING -->
+<!-- ════ LOADING ════ -->
 <div id="loading">
-  <span class="ld-crown">👑</span>
-  <div class="ld-name">Scarlat</div>
-  <div class="ld-tag">Mundo de Prêmios Exclusivos</div>
+  <div class="ld-ring">
+    <span class="ld-gem">💎</span>
+  </div>
+  <div class="ld-wordmark">Scarlat</div>
+  <div class="ld-sub">Mundo de Prêmios</div>
   <div class="ld-dots">
     <div class="ld-dot"></div>
     <div class="ld-dot"></div>
@@ -404,109 +1162,140 @@ body{
 
 <div id="app">
 
-<!-- ══ AUTH ══ -->
+<!-- ════ AUTH ════ -->
 <div id="screen-auth" class="screen active"
   style="display:flex;flex-direction:column;align-items:center;justify-content:center">
-  <div class="auth-brand">
-    <span class="auth-gem">💎</span>
-    <div class="auth-title">Scarlat</div>
-    <div class="auth-sub">Mundo de Prêmios Exclusivos</div>
-    <div class="auth-deco">— ✦ —</div>
+
+  <div class="auth-hero">
+    <div class="auth-logo-ring">
+      <span class="auth-logo-gem">💎</span>
+    </div>
+    <div class="auth-brand-name">Scarlat</div>
+    <div class="auth-brand-sub">Mundo de Prêmios Exclusivos</div>
+    <div class="auth-divider">✦</div>
   </div>
-  <div class="auth-box">
-    <div class="tabs">
+
+  <div class="auth-surface">
+    <div class="auth-tabs">
       <button class="tab on" onclick="setTab('login')">Entrar</button>
       <button class="tab" onclick="setTab('reg')">Cadastrar</button>
     </div>
+
     <div id="t-login">
-      <div class="fg"><label>E-mail</label>
-        <input class="inp" id="l-email" type="email" placeholder="seu@email.com" autocomplete="email"></div>
-      <div class="fg"><label>Senha</label>
-        <input class="inp" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-      <button class="btn-enter" id="b-login" onclick="doLogin()">✨ Entrar no Mundo Scarlat</button>
+      <div class="fg">
+        <label>E-mail</label>
+        <input class="inp" id="l-email" type="email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <input class="inp" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-gold" id="b-login" onclick="doLogin()">✨ Entrar no Mundo Scarlat</button>
       <div class="amsg" id="m-login"></div>
     </div>
+
     <div id="t-reg" style="display:none">
-      <div class="fg"><label>Seu nome</label>
-        <input class="inp" id="r-name" type="text" placeholder="Nome completo"></div>
-      <div class="fg"><label>E-mail</label>
-        <input class="inp" id="r-email" type="email" placeholder="seu@email.com" autocomplete="email"></div>
-      <div class="fg"><label>Senha</label>
-        <input class="inp" id="r-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
-      <button class="btn-enter" id="b-reg" onclick="doReg()">🌟 Criar minha conta</button>
+      <div class="fg">
+        <label>Seu nome</label>
+        <input class="inp" id="r-name" type="text" placeholder="Nome completo">
+      </div>
+      <div class="fg">
+        <label>E-mail</label>
+        <input class="inp" id="r-email" type="email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <input class="inp" id="r-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+      </div>
+      <button class="btn-gold" id="b-reg" onclick="doReg()">🌟 Criar minha conta</button>
       <div class="amsg" id="m-reg"></div>
     </div>
   </div>
 </div>
 
-<!-- ══ GAME ══ -->
+<!-- ════ GAME ════ -->
 <div id="screen-game" class="screen">
+
+  <!-- Topbar -->
   <div class="topbar">
     <div class="user-pill">
-      <div class="ava" id="ava">
-        <!-- avatar SVG da Tainá gerado inline -->
-        <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
-          <!-- fundo -->
-          <circle cx="22" cy="22" r="22" fill="url(#avaBg)"/>
-          <defs>
-            <radialGradient id="avaBg" cx="40%" cy="30%">
-              <stop offset="0%" stop-color="#e870a8"/>
-              <stop offset="100%" stop-color="#5a0a3a"/>
-            </radialGradient>
-          </defs>
-          <!-- cabelo -->
-          <ellipse cx="22" cy="14" rx="11" ry="12" fill="#1a0808"/>
-          <ellipse cx="22" cy="10" rx="10" ry="8" fill="#2a0a0a"/>
-          <!-- cachos laterais -->
-          <ellipse cx="11" cy="20" rx="4" ry="7" fill="#1a0808"/>
-          <ellipse cx="33" cy="20" rx="4" ry="7" fill="#1a0808"/>
-          <!-- rosto -->
-          <ellipse cx="22" cy="21" rx="9" ry="10" fill="#c8845a"/>
-          <!-- olhos -->
-          <ellipse cx="18.5" cy="20" rx="2" ry="2.2" fill="#1a0808"/>
-          <ellipse cx="25.5" cy="20" rx="2" ry="2.2" fill="#1a0808"/>
-          <circle cx="19.2" cy="19.2" r=".7" fill="#fff"/>
-          <circle cx="26.2" cy="19.2" r=".7" fill="#fff"/>
-          <!-- sorriso -->
-          <path d="M18 24 Q22 27 26 24" stroke="#8a3020" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-          <!-- coração na testa -->
-          <text x="20" y="16" font-size="5" text-anchor="middle">💖</text>
-          <!-- coroa -->
-          <text x="22" y="8" font-size="9" text-anchor="middle">👑</text>
-          <!-- roupa rosa -->
-          <path d="M13 38 Q22 32 31 38 L33 44 H11 Z" fill="#c8407a"/>
-          <!-- brincos dourados -->
-          <circle cx="13" cy="23" r="1.5" fill="#c8963a"/>
-          <circle cx="31" cy="23" r="1.5" fill="#c8963a"/>
-        </svg>
+      <div class="ava-wrap">
+        <div class="ava" id="ava">
+          <!-- Avatar SVG da Tainá CEO -->
+          <svg viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="ag" cx="40%" cy="30%">
+                <stop offset="0%" stop-color="#d85090"/>
+                <stop offset="100%" stop-color="#4a0820"/>
+              </radialGradient>
+            </defs>
+            <circle cx="23" cy="23" r="23" fill="url(#ag)"/>
+            <!-- Cabelo -->
+            <ellipse cx="23" cy="15" rx="12" ry="13" fill="#150505"/>
+            <ellipse cx="23" cy="11" rx="11" ry="9"  fill="#1e0808"/>
+            <!-- Cachos laterais -->
+            <ellipse cx="11" cy="22" rx="4.5" ry="8" fill="#150505"/>
+            <ellipse cx="35" cy="22" rx="4.5" ry="8" fill="#150505"/>
+            <!-- Rosto -->
+            <ellipse cx="23" cy="23" rx="9.5" ry="10.5" fill="#c8845a"/>
+            <!-- Blush nas bochechas -->
+            <ellipse cx="17" cy="25" rx="3" ry="1.5" fill="rgba(220,100,100,.25)"/>
+            <ellipse cx="29" cy="25" rx="3" ry="1.5" fill="rgba(220,100,100,.25)"/>
+            <!-- Olhos -->
+            <ellipse cx="19" cy="21.5" rx="2.2" ry="2.4" fill="#0d0505"/>
+            <ellipse cx="27" cy="21.5" rx="2.2" ry="2.4" fill="#0d0505"/>
+            <!-- Brilho olho -->
+            <circle cx="19.8" cy="20.6" r=".7" fill="white"/>
+            <circle cx="27.8" cy="20.6" r=".7" fill="white"/>
+            <!-- Sorriso -->
+            <path d="M18.5 26.5 Q23 30 27.5 26.5" stroke="#8a3020" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <!-- Brincos dourados -->
+            <circle cx="12.5" cy="25" r="2"   fill="#c8963a" stroke="#a07020" stroke-width=".5"/>
+            <circle cx="33.5" cy="25" r="2"   fill="#c8963a" stroke="#a07020" stroke-width=".5"/>
+            <!-- Colar de pérolas -->
+            <path d="M15 36 Q23 34 31 36" stroke="none" fill="none"/>
+            <!-- Roupa rosa-vinho -->
+            <path d="M12 44 Q23 36 34 44 L46 46 H0 Z" fill="#9b1942"/>
+            <!-- Coroa dourada -->
+            <text x="23" y="10" font-size="10" text-anchor="middle" dominant-baseline="middle">👑</text>
+          </svg>
+        </div>
+        <div class="ava-dot"></div>
       </div>
       <div>
         <div class="uname" id="uname">…</div>
         <div class="usub">Jogadora Scarlat 💎</div>
       </div>
     </div>
-    <div class="coins-bar">
+    <div class="topbar-right">
       <div class="coin-chip">💎 <span id="user-coins">0</span></div>
-      <button class="del-btn" style="font-size:11px" onclick="doOut()">Sair</button>
+      <button class="btn-sair" onclick="doOut()">Sair</button>
     </div>
   </div>
 
-  <!-- Banner da temporada -->
+  <!-- Season Hero -->
   <div class="season-hero">
-    <div class="s-eyebrow">✦ Temporada Ativa ✦</div>
+    <div class="sh-deco-l"></div>
+    <div class="sh-deco-r"></div>
+    <div class="s-eyebrow">
+      <span class="s-eyebrow-dot"></span>
+      <span id="sbadge">Temporada Ativa</span>
+    </div>
     <div class="s-name" id="s-name">Carregando…</div>
-    <div class="s-progress">
-      <div class="s-bar"><div class="s-fill" id="s-fill" style="width:0%"></div></div>
+    <div class="s-progress-wrap">
+      <div class="s-bar">
+        <div class="s-fill" id="s-fill" style="width:0%"></div>
+      </div>
       <div class="s-txt">Casa <strong id="s-cur">0</strong>/<strong id="s-tot">20</strong></div>
     </div>
   </div>
 
-  <!-- TABULEIRO CANVAS -->
+  <!-- Tabuleiro Canvas -->
   <div class="board-section">
     <canvas id="game-canvas"></canvas>
   </div>
 
-  <!-- Próximo prêmio -->
+  <!-- Próximo Prêmio -->
   <div class="next-prize-bar" id="next-bar">
     <div class="np-icon" id="np-icon">🎁</div>
     <div class="np-info">
@@ -514,6 +1303,7 @@ body{
       <div class="np-name" id="np-name">Carregando…</div>
       <div class="np-dist" id="np-dist"></div>
     </div>
+    <div class="np-arrow">›</div>
   </div>
 
   <!-- Marcos -->
@@ -524,7 +1314,7 @@ body{
 
   <!-- Código -->
   <div class="code-section">
-    <div class="sec-label" style="margin-bottom:12px">🛍️ Inserir Código de Compra</div>
+    <div class="sec-label" style="margin-bottom:14px">🛍️ Inserir Código de Compra</div>
     <div class="code-row">
       <input class="code-inp" id="code-inp" type="text" placeholder="CÓDIGO"
         maxlength="14" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -534,34 +1324,40 @@ body{
   </div>
 </div>
 
-<!-- ══ HISTÓRICO ══ -->
+<!-- ════ HISTÓRICO ════ -->
 <div id="screen-hist" class="screen">
   <div class="page-title">✨ Minha Jornada</div>
   <div style="padding:0 0 8px">
     <div class="sec-label" style="padding:0 14px">🏆 Prêmios Conquistados</div>
     <div id="pr-list"></div>
-    <div class="sec-label" style="padding:0 14px;margin-top:16px">🛍️ Histórico de Compras</div>
+    <div class="sec-label" style="padding:0 14px;margin-top:18px">🛍️ Histórico de Compras</div>
     <div id="mv-list"></div>
   </div>
 </div>
 
-<!-- ══ ADMIN ══ -->
+<!-- ════ ADMIN ════ -->
 <div id="screen-admin" class="screen">
   <div class="page-title">⚙️ Painel Admin</div>
 
   <div class="admin-card">
     <h3>🔑 Gerar Código de Compra</h3>
-    <div class="fg"><label>Código (você define)</label>
+    <div class="fg">
+      <label>Código (você define)</label>
       <input class="inp" id="a-code" type="text" placeholder="Ex: ROSA2025"
-        style="text-transform:uppercase;letter-spacing:4px;font-weight:900;font-size:16px"></div>
+        style="text-transform:uppercase;letter-spacing:5px;font-weight:900;font-size:16px">
+    </div>
     <div class="irow">
       <div class="fg"><label>Casas</label>
-        <input class="inp" id="a-houses" type="number" min="1" max="20" value="2"></div>
+        <input class="inp" id="a-houses" type="number" min="1" max="20" value="2">
+      </div>
       <div class="fg"><label>Valor R$</label>
-        <input class="inp" id="a-val" type="number" placeholder="0"></div>
+        <input class="inp" id="a-val" type="number" placeholder="0">
+      </div>
     </div>
-    <div class="fg"><label>Descrição interna</label>
-      <input class="inp" id="a-desc" type="text" placeholder="ex: Anéis — Maria Silva"></div>
+    <div class="fg">
+      <label>Descrição interna</label>
+      <input class="inp" id="a-desc" type="text" placeholder="ex: Anéis — Maria Silva">
+    </div>
     <button class="btn-adm" style="width:100%;padding:14px;margin-top:4px" onclick="adminCreate()">
       ✨ Criar Código
     </button>
@@ -588,7 +1384,137 @@ body{
   </div>
 </div>
 
+
+<!-- ════ LOBBY ════ -->
+<div id="screen-lobby" class="screen">
+  <div class="lobby-bg"></div>
+  <div class="lobby-inner">
+    <div class="lobby-header">
+      <button class="lobby-btn-sair" onclick="doOut()">Sair</button>
+    </div>
+    <div class="lobby-logo-area">
+      <div class="lobby-avatar-ring">
+        <div class="lobby-avatar-circle">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="lobbyBg" cx="40%" cy="30%">
+                <stop offset="0%" stop-color="#d85090"/><stop offset="100%" stop-color="#4a0820"/>
+              </radialGradient>
+            </defs>
+            <circle cx="60" cy="60" r="60" fill="url(#lobbyBg)"/>
+            <ellipse cx="60" cy="38" rx="32" ry="36" fill="#150505"/>
+            <ellipse cx="60" cy="28" rx="30" ry="24" fill="#1e0808"/>
+            <ellipse cx="28" cy="58" rx="12" ry="22" fill="#150505"/>
+            <ellipse cx="92" cy="58" rx="12" ry="22" fill="#150505"/>
+            <ellipse cx="60" cy="62" rx="26" ry="28" fill="#c8845a"/>
+            <ellipse cx="44" cy="68" rx="8" ry="4" fill="rgba(220,100,100,.22)"/>
+            <ellipse cx="76" cy="68" rx="8" ry="4" fill="rgba(220,100,100,.22)"/>
+            <ellipse cx="50" cy="57" rx="6" ry="6.5" fill="#0d0505"/>
+            <ellipse cx="70" cy="57" rx="6" ry="6.5" fill="#0d0505"/>
+            <circle cx="52" cy="55" r="2" fill="white"/><circle cx="72" cy="55" r="2" fill="white"/>
+            <path d="M48 70 Q60 80 72 70" stroke="#8a3020" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <circle cx="33" cy="66" r="5" fill="#c8963a" stroke="#a07020" stroke-width="1"/>
+            <circle cx="87" cy="66" r="5" fill="#c8963a" stroke="#a07020" stroke-width="1"/>
+            <path d="M30 114 Q60 96 90 114 L120 120 H0 Z" fill="#9b1942"/>
+            <circle cx="48" cy="96" r="3" fill="#f0e8d0"/><circle cx="56" cy="93" r="3" fill="#f0e8d0"/>
+            <circle cx="64" cy="92" r="3" fill="#f0e8d0"/><circle cx="72" cy="93" r="3" fill="#f0e8d0"/>
+            <text x="60" y="22" font-size="28" text-anchor="middle" dominant-baseline="middle">&#128081;</text>
+          </svg>
+        </div>
+      </div>
+      <div class="lobby-taina-name">&#10022; Tain&#225; &#8212; CEO Scarlat &#10022;</div>
+      <div class="lobby-game-title">Scarlat</div>
+      <div class="lobby-game-sub">Mundo de Pr&#234;mios Exclusivos</div>
+      <div class="lobby-deco">&#10022;</div>
+    </div>
+    <div class="lobby-welcome-card">
+      <div class="lobby-hi">Bem-vinda de volta,<strong id="lobby-uname">Jogadora</strong></div>
+      <div class="lobby-status-row">
+        <div class="lobby-stat">
+          <span class="lobby-stat-icon">&#127968;</span>
+          <div class="lobby-stat-val" id="lobby-cur-house">0</div>
+          <div class="lobby-stat-lbl">Casa atual</div>
+        </div>
+        <div class="lobby-stat">
+          <span class="lobby-stat-icon">&#127873;</span>
+          <div class="lobby-stat-val" id="lobby-prizes-won">0</div>
+          <div class="lobby-stat-lbl">Pr&#234;mios ganhos</div>
+        </div>
+        <div class="lobby-stat">
+          <span class="lobby-stat-icon">&#127942;</span>
+          <div class="lobby-stat-val" id="lobby-total-houses">20</div>
+          <div class="lobby-stat-lbl">Meta</div>
+        </div>
+      </div>
+      <div class="lobby-next-prize" id="lobby-next-prize" style="display:none">
+        <div class="lnp-icon" id="lobby-np-icon">&#127873;</div>
+        <div class="lnp-info">
+          <div class="lnp-label">Pr&#243;ximo Pr&#234;mio</div>
+          <div class="lnp-name" id="lobby-np-name">&#8212;</div>
+          <div class="lnp-dist" id="lobby-np-dist"></div>
+        </div>
+      </div>
+    </div>
+    <button class="lobby-play-btn" onclick="goToGame()">&#10022; Jogar Agora &#10022;</button>
+    <button class="lobby-how-btn" onclick="openRules()">&#10067; Como funciona o jogo?</button>
+    <div class="lobby-footer">Scarlat Joias &#183; Jogo de Fideliza&#231;&#227;o &#183; 2025</div>
+  </div>
+</div>
+
 </div><!-- /#app -->
+
+<!-- ════ MODAL REGRAS ════ -->
+<div id="modal-rules">
+  <div class="rules-card">
+    <div class="rules-header">
+      <div class="rules-title">Como Funciona &#128142;</div>
+      <div class="rules-subtitle">Tudo que voc&#234; precisa saber</div>
+      <button class="rules-close-btn" onclick="closeRules()">&#10005;</button>
+    </div>
+    <div class="rules-body">
+      <div class="rules-step">
+        <div class="rules-step-num">1</div>
+        <div class="rules-step-text">
+          <div class="rules-step-title">Compre com a Scarlat &#128717;</div>
+          <div class="rules-step-desc">Fa&#231;a sua compra normalmente com uma de nossas consultoras. Cada compra gera um c&#243;digo exclusivo para voc&#234;!</div>
+        </div>
+      </div>
+      <div class="rules-step">
+        <div class="rules-step-num">2</div>
+        <div class="rules-step-text">
+          <div class="rules-step-title">Receba seu C&#243;digo &#10024;</div>
+          <div class="rules-step-desc">Ap&#243;s a compra, sua consultora envia um c&#243;digo &#250;nico via WhatsApp. Guarde-o com carinho!</div>
+        </div>
+      </div>
+      <div class="rules-step">
+        <div class="rules-step-num">3</div>
+        <div class="rules-step-text">
+          <div class="rules-step-title">Insira o C&#243;digo no Jogo &#127922;</div>
+          <div class="rules-step-desc">Entre no Mundo Scarlat e insira seu c&#243;digo na tela do tabuleiro. Voc&#234; avan&#231;a conforme o valor da compra!</div>
+        </div>
+      </div>
+      <div class="rules-step">
+        <div class="rules-step-num">4</div>
+        <div class="rules-step-text">
+          <div class="rules-step-title">Conquiste Pr&#234;mios &#128081;</div>
+          <div class="rules-step-desc">Cada vez que voc&#234; passa por uma casa especial, ganha o pr&#234;mio daquela casa! A equipe Scarlat entra em contato.</div>
+        </div>
+      </div>
+      <div class="rules-prizes-box">
+        <div class="rules-prizes-title">Tipos de Pr&#234;mio</div>
+        <div class="prize-type-row"><span class="prize-type-icon">&#127873;</span><div><div class="prize-type-name">Caixa Surpresa</div><div class="prize-type-desc">Um mimo especial cheio de surpresas Scarlat</div></div></div>
+        <div class="prize-type-row"><span class="prize-type-icon">&#128273;</span><div><div class="prize-type-name">Chave / Cr&#233;dito</div><div class="prize-type-desc">Cr&#233;dito em reais para sua pr&#243;xima compra</div></div></div>
+        <div class="prize-type-row"><span class="prize-type-icon">&#128142;</span><div><div class="prize-type-name">Ba&#250; de Joias</div><div class="prize-type-desc">Pe&#231;a exclusiva da cole&#231;&#227;o Scarlat</div></div></div>
+        <div class="prize-type-row"><span class="prize-type-icon">&#128081;</span><div><div class="prize-type-name">Grande Pr&#234;mio</div><div class="prize-type-desc">A joia mais especial da temporada!</div></div></div>
+        <div class="prize-type-row"><span class="prize-type-icon">&#11088;</span><div><div class="prize-type-name">B&#244;nus Especial</div><div class="prize-type-desc">Surpresa exclusiva definida pela equipe Scarlat</div></div></div>
+      </div>
+      <div class="rules-note">
+        <strong>&#128161; Dica da Tain&#225;:</strong> Quanto mais voc&#234; compra, mais casas avan&#231;a e mais perto fica dos pr&#234;mios grandes! Os pr&#234;mios s&#227;o garantidos. &#127801;
+      </div>
+      <button class="rules-cta-btn" onclick="closeRules()">&#10024; Entendido! Vamos jogar!</button>
+    </div>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav class="nav" id="nav">
@@ -608,80 +1534,69 @@ body{
 <!-- MODAL PRÊMIO -->
 <div class="overlay" id="modal">
   <div class="mcard">
+    <div class="mcard-glow"></div>
     <span class="m-firework">🎊</span>
     <div class="m-title">Você ganhou!</div>
-    <div class="m-sub" id="m-sub">Parabéns!</div>
+    <div class="m-sub" id="m-sub">Parabéns pela conquista!</div>
     <div id="m-prizes"></div>
     <button class="btn-close" onclick="closeModal()">🌟 Uhuuu! Fechar</button>
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT — Lógica 100% preservada
+════════════════════════════════════════════ -->
 <script>
-// ═══════════════════════════════════════
-// SUPABASE
-// ═══════════════════════════════════════
+/* ─── SUPABASE ─── */
 const SB_URL = 'https://hyuqruwpcevwhwqmptbe.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5dXFydXdwY2V2d2h3cW1wdGJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDc2MDEsImV4cCI6MjA5NDYyMzYwMX0.RnvjjBR5Q7-Hychh-znxylXXLplG3xxartOktpT1XHE';
 const db = supabase.createClient(SB_URL, SB_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
-let USER=null, PROF=null, SEASON=null, PRIZES=[], MOVES=[], CLAIMS=[];
-let ANIM_POS = 0; // posição atual do avatar no canvas (float para animação)
-let ANIM_TARGET = 0;
-let ANIM_RAF = null;
+/* ─── STATE ─── */
+let USER = null, PROF = null, SEASON = null, PRIZES = [], MOVES = [], CLAIMS = [];
+let ANIM_POS = 0, ANIM_TARGET = 0, ANIM_RAF = null;
 
-const ICONS = {surprise:'🎁',key:'🔑',chest:'💎',crown:'👑',bonus:'⭐',trip:'✈️',empty:'·'};
-const EV = {'code_used_success':'✅','code_invalid':'❌','code_already_used':'⚠️',
-  'rate_limit_hit':'🚫','code_created':'🔑','prize_delivered':'📦','code_error':'💥'};
+const ICONS = { surprise:'🎁', key:'🔑', chest:'💎', crown:'👑', bonus:'⭐', trip:'✈️', empty:'·' };
+const EV    = { 'code_used_success':'✅','code_invalid':'❌','code_already_used':'⚠️','rate_limit_hit':'🚫','code_created':'🔑','prize_delivered':'📦','code_error':'💥' };
 
-// ═══════════════════════════════════════
-// PARTÍCULAS
-// ═══════════════════════════════════════
+/* ─── PARTÍCULAS ─── */
 function createStars() {
   const c = document.getElementById('particles');
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 50; i++) {
     const s = document.createElement('div');
-    const sz = Math.random() * 3 + 1;
+    const sz = Math.random() * 2.5 + .8;
+    const colors = ['#fff','#ffd980','#ffa0c8','#c8922a','#e0407a'];
     s.className = 'star';
     s.style.cssText = `
       width:${sz}px;height:${sz}px;
       left:${Math.random()*100}%;top:${Math.random()*100}%;
-      background:${['#fff','#e8c06a','#ff9fd0'][Math.floor(Math.random()*3)]};
-      --d:${2+Math.random()*4}s;--del:${Math.random()*4}s;
-      opacity:${Math.random()*.5+.1};
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      --d:${2+Math.random()*5}s;--dl:${Math.random()*5}s;
+      opacity:${Math.random()*.6+.1};
     `;
     c.appendChild(s);
   }
 }
 
-// ═══════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════
+/* ─── BOOT ─── */
 addEventListener('DOMContentLoaded', async () => {
   createStars();
-  setTimeout(() => document.getElementById('loading').classList.add('gone'), 2200);
-
+  setTimeout(() => document.getElementById('loading').classList.add('gone'), 2400);
   try {
     const { data: { session } } = await db.auth.getSession();
     if (session?.user) { await boot(session.user); return; }
   } catch(e) {}
-
   db.auth.onAuthStateChange(async (ev, s) => {
-    if (ev === 'SIGNED_IN' && s?.user) await boot(s.user);
-    if (ev === 'SIGNED_OUT') showAuth();
+    if (ev === 'SIGNED_IN'  && s?.user) await boot(s.user);
+    if (ev === 'SIGNED_OUT')             showAuth();
   });
 });
 
 async function boot(user) {
   USER = user;
-  try {
-    const { data } = await db.from('profiles').select('*').eq('id', user.id).single();
-    PROF = data;
-  } catch(e) {}
+  try { const { data } = await db.from('profiles').select('*').eq('id', user.id).single(); PROF = data; } catch(e) {}
   await loadAll();
   showGame();
 }
@@ -696,400 +1611,359 @@ async function loadSeason() {
     const { data } = await db.from('seasons').select('*').eq('is_active', true).single();
     SEASON = data;
     if (SEASON) {
-      const { data: p } = await db.from('house_prizes')
-        .select('*').eq('season_id', SEASON.id).order('house_number');
+      const { data: p } = await db.from('house_prizes').select('*').eq('season_id', SEASON.id).order('house_number');
       PRIZES = p || [];
     }
   } catch(e) {}
 }
-
 async function loadMoves() {
   if (!USER || !SEASON) return;
-  try {
-    const { data } = await db.from('board_moves')
-      .select('*').eq('client_id', USER.id).eq('season_id', SEASON.id)
-      .order('moved_at', { ascending: false }).limit(30);
-    MOVES = data || [];
-  } catch(e) {}
+  try { const { data } = await db.from('board_moves').select('*').eq('client_id', USER.id).eq('season_id', SEASON.id).order('moved_at', {ascending:false}).limit(30); MOVES = data || []; } catch(e) {}
 }
-
 async function loadClaims() {
   if (!USER || !SEASON) return;
-  try {
-    const { data } = await db.from('prize_claims')
-      .select('*, house_prizes(*)').eq('client_id', USER.id).eq('season_id', SEASON.id)
-      .order('claimed_at', { ascending: false });
-    CLAIMS = data || [];
-  } catch(e) {}
+  try { const { data } = await db.from('prize_claims').select('*, house_prizes(*)').eq('client_id', USER.id).eq('season_id', SEASON.id).order('claimed_at', {ascending:false}); CLAIMS = data || []; } catch(e) {}
 }
 
-// ═══════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════
+/* ─── AUTH ─── */
 function setTab(t) {
-  document.getElementById('t-login').style.display = t==='login'?'block':'none';
-  document.getElementById('t-reg').style.display   = t==='reg'  ?'block':'none';
+  el('t-login').style.display = t === 'login' ? 'block' : 'none';
+  el('t-reg').style.display   = t === 'reg'   ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach((b,i) =>
     b.classList.toggle('on', (i===0&&t==='login')||(i===1&&t==='reg')));
 }
-
 async function doLogin() {
-  const email=v('l-email'), pass=v('l-pass'), btn=el('b-login'), m=el('m-login');
+  const email = v('l-email'), pass = v('l-pass'), btn = el('b-login'), m = el('m-login');
   if (!email||!pass) { setMsg(m,'Preencha e-mail e senha.','err'); return; }
-  btn.disabled=true; btn.textContent='Entrando…';
+  btn.disabled = true; btn.textContent = 'Entrando…';
   try {
     const { error } = await db.auth.signInWithPassword({ email, password: pass });
     if (error) throw error;
   } catch(e) {
-    setMsg(m, e.message?.includes('Invalid')?'E-mail ou senha incorretos.':(e.message||'Erro.'), 'err');
-    btn.disabled=false; btn.textContent='✨ Entrar no Mundo Scarlat';
+    setMsg(m, e.message?.includes('Invalid') ? 'E-mail ou senha incorretos.' : (e.message||'Erro.'), 'err');
+    btn.disabled = false; btn.textContent = '✨ Entrar no Mundo Scarlat';
   }
 }
-
 async function doReg() {
-  const name=v('r-name'), email=v('r-email'), pass=v('r-pass');
-  const btn=el('b-reg'), m=el('m-reg');
+  const name=v('r-name'), email=v('r-email'), pass=v('r-pass'), btn=el('b-reg'), m=el('m-reg');
   if (!name||!email||!pass) { setMsg(m,'Preencha todos os campos.','err'); return; }
   if (pass.length<6) { setMsg(m,'Senha: mínimo 6 caracteres.','err'); return; }
   btn.disabled=true; btn.textContent='Criando…';
-  const { error } = await db.auth.signUp({ email, password: pass, options:{ data:{ full_name:name } } });
+  const { error } = await db.auth.signUp({ email, password:pass, options:{ data:{ full_name:name } } });
   if (error) setMsg(m, error.message, 'err');
   else setMsg(m, '✅ Conta criada! Verifique seu e-mail.', 'ok');
   btn.disabled=false; btn.textContent='🌟 Criar minha conta';
 }
-
 async function doOut() { await db.auth.signOut(); }
 
-// ═══════════════════════════════════════
-// SCREENS
-// ═══════════════════════════════════════
+/* ─── SCREENS ─── */
 function showAuth() {
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
   const sa = el('screen-auth');
-  sa.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center';
+  sa.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center';
   sa.classList.add('active');
-  el('nav').style.display='none';
+  el('nav').style.display = 'none';
   USER=null; PROF=null;
 }
-
 function showGame() {
+  // Vai para o LOBBY primeiro (sempre), não direto ao jogo
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
-  el('nav').style.display='block';
-  if (PROF?.role==='admin') el('nb-admin').style.display='flex';
+  el('nav').style.display = 'none'; // Nav fica oculto no lobby
+  renderLobby();
+  const lobby = el('screen-lobby');
+  lobby.style.display = 'block';
+  lobby.classList.add('active');
+}
+
+function renderLobby() {
+  const name = PROF?.full_name || USER?.email || 'Jogadora';
+  const cur  = PROF?.current_house || 0;
+  const tot  = SEASON?.total_houses || 20;
+
+  el('lobby-uname').textContent       = name.split(' ')[0];
+  el('lobby-cur-house').textContent   = cur;
+  el('lobby-prizes-won').textContent  = CLAIMS.length;
+  el('lobby-total-houses').textContent = tot;
+
+  // Próximo prêmio
+  const nextPrize = PRIZES.find(p => p.house_number > cur);
+  const npBar = el('lobby-next-prize');
+  if (nextPrize) {
+    npBar.style.display = 'flex';
+    el('lobby-np-icon').textContent = ICONS[nextPrize.prize_type] || '🎁';
+    el('lobby-np-name').textContent = nextPrize.prize_name;
+    const dist = nextPrize.house_number - cur;
+    el('lobby-np-dist').textContent = `Casa ${nextPrize.house_number} — faltam ${dist} ${dist===1?'casa':'casas'}`;
+  } else {
+    npBar.style.display = 'none';
+  }
+}
+
+function goToGame() {
+  // Do lobby vai para o jogo com nav
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  el('nav').style.display = 'block';
+  if (PROF?.role === 'admin') el('nb-admin').style.display = 'flex';
   goScreen('game');
 }
 
+function openRules()  { el('modal-rules').classList.add('open'); }
+function closeRules() { el('modal-rules').classList.remove('open'); }
 function goScreen(name) {
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
   document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
-  const s=el('screen-'+name); s.style.display='block'; s.classList.add('active');
-  const nb=el('nb-'+name); if(nb) nb.classList.add('on');
+  const s = el('screen-'+name); s.style.display='block'; s.classList.add('active');
+  const nb = el('nb-'+name); if (nb) nb.classList.add('on');
   if (name==='game')  renderGame();
   if (name==='hist')  renderHist();
   if (name==='admin') renderAdmin();
 }
 
-// ═══════════════════════════════════════
-// TABULEIRO CANVAS — ESPIRAL
-// ═══════════════════════════════════════
-let CANVAS, CTX, CELL_POSITIONS=[], CANVAS_W, CANVAS_H;
-
-function buildSpiralPositions(total, w) {
-  // Gera posições em espiral, de fora para dentro, como nas fotos
-  const cols = 5, rows = Math.ceil(total / cols);
-  const cellW = (w - 28) / cols;
-  const cellH = cellW; // quadrado
-  const padX = 14, padY = 14;
-  const positions = [];
-
-  // Posições em espiral: percorre borda externa, depois vai para dentro
-  // Usamos uma grade lógica e percorremos em espiral
-  const totalH = rows * cellH + padY * 2;
-
-  // Define percurso espiral em grid 5 x rows
-  // Simplificado: fila de baixo da esquerda, sobe pela direita, fila de cima da direita, desce pela esquerda...
-  // Gera índices em ordem espiral
-  const gridW = cols, gridH = rows;
-  const grid = [];
-  for (let r=0;r<gridH;r++) for (let c=0;c<gridW;c++) grid.push({r,c});
-
-  // Percurso em espiral (sentido anti-horário de fora para dentro, começando bottom-left)
-  const spiralIdx = spiralOrder(gridW, gridH);
-
-  spiralIdx.forEach(({r,c}, idx) => {
-    if (idx >= total) return;
-    const x = padX + c * cellW + cellW/2;
-    const y = padY + r * cellH + cellH/2;
-    positions.push({ x, y, w: cellW-6, h: cellH-6, idx });
-  });
-
-  return { positions, totalH: totalH };
-}
+/* ─── CANVAS / TABULEIRO ─── */
+let CANVAS, CTX, CELL_POSITIONS = [], CANVAS_W, CANVAS_H;
 
 function spiralOrder(cols, rows) {
-  // Percurso em espiral começando do canto inferior esquerdo
   const result = [];
-  for (let layer = 0; layer < Math.ceil(Math.min(cols, rows) / 2); layer++) {
-    const rTop = layer, rBot = rows - 1 - layer;
-    const cLeft = layer, cRight = cols - 1 - layer;
-    if (rTop > rBot || cLeft > cRight) break;
-    // Linha de baixo: esquerda → direita
-    for (let cc = cLeft; cc <= cRight; cc++) result.push({r: rBot, c: cc});
-    // Coluna direita: de baixo para cima (exceto último)
-    for (let rr = rBot - 1; rr >= rTop; rr--) result.push({r: rr, c: cRight});
-    if (rBot > rTop) {
-      // Linha de cima: direita → esquerda (exceto último)
-      for (let cc = cRight - 1; cc >= cLeft; cc--) result.push({r: rTop, c: cc});
-      if (cLeft < cRight) {
-        // Coluna esquerda: de cima para baixo (exceto extremos)
-        for (let rr = rTop + 1; rr < rBot; rr++) result.push({r: rr, c: cLeft});
-      }
+  for (let layer = 0; layer < Math.ceil(Math.min(cols,rows)/2); layer++) {
+    const rTop=layer, rBot=rows-1-layer, cLeft=layer, cRight=cols-1-layer;
+    if (rTop>rBot||cLeft>cRight) break;
+    for (let c=cLeft;c<=cRight;c++) result.push({r:rBot,c});
+    for (let r=rBot-1;r>=rTop;r--) result.push({r,c:cRight});
+    if (rBot>rTop) {
+      for (let c=cRight-1;c>=cLeft;c--) result.push({r:rTop,c});
+      if (cLeft<cRight) for (let r=rTop+1;r<rBot;r++) result.push({r,c:cLeft});
     }
   }
   return result;
 }
 
-function drawBoard() {
-  if (!CANVAS || !CTX || !SEASON) return;
-  const cur = PROF?.current_house || 0;
-  const total = SEASON.total_houses;
-  const w = CANVAS_W;
-  CTX.clearRect(0, 0, CANVAS_W, CANVAS_H);
-
-  // Fundo do canvas
-  const bgGrad = CTX.createRadialGradient(w/2, CANVAS_H/2, 0, w/2, CANVAS_H/2, CANVAS_H/1.5);
-  bgGrad.addColorStop(0, 'rgba(74,30,136,0.15)');
-  bgGrad.addColorStop(1, 'rgba(13,4,22,0)');
-  CTX.fillStyle = bgGrad;
-  CTX.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-  // Linha de conexão entre casas
-  if (CELL_POSITIONS.length > 1) {
-    CTX.save();
-    CTX.strokeStyle = 'rgba(200,150,58,0.18)';
-    CTX.lineWidth = 3;
-    CTX.lineCap = 'round';
-    CTX.setLineDash([6, 8]);
-    CTX.beginPath();
-    CTX.moveTo(CELL_POSITIONS[0].x, CELL_POSITIONS[0].y);
-    for (let i=1;i<CELL_POSITIONS.length;i++) {
-      CTX.lineTo(CELL_POSITIONS[i].x, CELL_POSITIONS[i].y);
-    }
-    CTX.stroke();
-    CTX.setLineDash([]);
-    CTX.restore();
-  }
-
-  // Desenha cada casa
-  CELL_POSITIONS.forEach((pos, i) => {
-    const houseNum = i + 1;
-    const prize = PRIZES.find(p => p.house_number === houseNum);
-    const isWon  = CLAIMS.some(c => c.house_number === houseNum);
-    const isCur  = houseNum === Math.round(ANIM_POS === 0 ? cur : ANIM_POS);
-    const isPast = houseNum < cur;
-    const hw = pos.w / 2, hh = pos.h / 2;
-
-    CTX.save();
-    CTX.translate(pos.x, pos.y);
-
-    // Sombra
-    CTX.shadowColor = prize ? 'rgba(200,150,58,0.4)' : 'rgba(0,0,0,0.3)';
-    CTX.shadowBlur = prize ? 12 : 6;
-
-    // Fundo da casa
-    const r = pos.w * 0.18; // border radius proporcional
-    roundRect(CTX, -hw, -hh, pos.w, pos.h, r);
-
-    let fillColor;
-    if (isWon && prize)      fillColor = createLinGrad(CTX, -hw,-hh,hw,hh,'rgba(200,150,58,0.35)','rgba(138,98,34,0.2)');
-    else if (isCur)          fillColor = createLinGrad(CTX, -hw,-hh,hw,hh,'rgba(200,64,122,0.45)','rgba(122,32,80,0.3)');
-    else if (isPast)         fillColor = 'rgba(200,150,58,0.08)';
-    else if (prize)          fillColor = createLinGrad(CTX, -hw,-hh,hw,hh,'rgba(200,150,58,0.18)','rgba(74,30,136,0.1)');
-    else                     fillColor = 'rgba(255,255,255,0.05)';
-
-    CTX.fillStyle = fillColor;
-    CTX.fill();
-    CTX.shadowBlur = 0;
-
-    // Borda
-    roundRect(CTX, -hw, -hh, pos.w, pos.h, r);
-    if (isCur)          CTX.strokeStyle = 'rgba(232,112,168,0.9)';
-    else if (isWon&&prize) CTX.strokeStyle = 'rgba(200,150,58,0.7)';
-    else if (prize)     CTX.strokeStyle = 'rgba(200,150,58,0.4)';
-    else                CTX.strokeStyle = 'rgba(255,255,255,0.08)';
-    CTX.lineWidth = isCur ? 2.5 : 1.5;
-    CTX.stroke();
-
-    // Brilho no topo da casa (highlight)
-    if (prize || isCur) {
-      CTX.save();
-      roundRect(CTX, -hw, -hh, pos.w, pos.h * 0.4, r);
-      CTX.fillStyle = 'rgba(255,255,255,0.07)';
-      CTX.fill();
-      CTX.restore();
-    }
-
-    // Ícone da casa
-    CTX.font = `${pos.w * 0.38}px serif`;
-    CTX.textAlign = 'center';
-    CTX.textBaseline = 'middle';
-    if (prize && !isCur) {
-      CTX.globalAlpha = isWon ? 1 : 0.9;
-      CTX.fillText(ICONS[prize.prize_type] || '🎁', 0, -pos.h * 0.1);
-      CTX.globalAlpha = 1;
-    }
-
-    // Número
-    CTX.font = `bold ${pos.w * 0.22}px Nunito, sans-serif`;
-    CTX.fillStyle = isCur ? '#fff' : prize ? 'rgba(232,192,106,0.9)' : 'rgba(255,255,255,0.3)';
-    CTX.textBaseline = 'middle';
-    CTX.fillText(houseNum, 0, prize && !isCur ? pos.h * 0.28 : 0);
-
-    // Efeito de brilho pulsante na casa atual
-    if (isCur) {
-      const pulse = (Math.sin(Date.now() / 400) + 1) / 2;
-      CTX.shadowColor = 'rgba(232,112,168,0.8)';
-      CTX.shadowBlur = 20 * pulse + 8;
-      roundRect(CTX, -hw, -hh, pos.w, pos.h, r);
-      CTX.strokeStyle = `rgba(232,112,168,${0.4 + pulse * 0.4})`;
-      CTX.lineWidth = 2;
-      CTX.stroke();
-      CTX.shadowBlur = 0;
-    }
-
-    CTX.restore();
-  });
-
-  // AVATAR DA TAINÁ animado
-  if (ANIM_POS > 0 && CELL_POSITIONS.length > 0) {
-    const posIdx = Math.min(Math.round(ANIM_POS) - 1, CELL_POSITIONS.length - 1);
-    const pos = CELL_POSITIONS[posIdx];
-    if (pos) drawAvatar(pos.x, pos.y - pos.h * 0.5 - 18, pos.w * 0.75);
-  } else if (cur > 0 && CELL_POSITIONS.length > 0) {
-    const pos = CELL_POSITIONS[Math.min(cur-1, CELL_POSITIONS.length-1)];
-    if (pos) drawAvatar(pos.x, pos.y - pos.h * 0.5 - 18, pos.w * 0.75);
-  }
+function buildLayout(total, w) {
+  const cols=5, pad=14;
+  const rows = Math.ceil(total/cols);
+  const cellW = (w - pad*2) / cols;
+  const cellH = cellW;
+  const totalH = rows * cellH + pad * 2;
+  const order = spiralOrder(cols, rows);
+  const positions = order.slice(0, total).map(({r,c}) => ({
+    x: pad + c*cellW + cellW/2,
+    y: pad + r*cellH + cellH/2,
+    w: cellW - 7,
+    h: cellH - 7
+  }));
+  return { positions, totalH };
 }
 
-function drawAvatar(x, y, size) {
-  const s = size * 0.5;
-  CTX.save();
-  CTX.translate(x, y);
-
-  // Sombra do avatar
-  CTX.shadowColor='rgba(200,64,122,0.6)'; CTX.shadowBlur=14;
-
-  // Corpo
-  CTX.beginPath(); CTX.arc(0, 0, s, 0, Math.PI*2);
-  const bodyGrad=CTX.createRadialGradient(-s*.2,-s*.3,0,0,0,s);
-  bodyGrad.addColorStop(0,'#e870a8'); bodyGrad.addColorStop(1,'#7a1045');
-  CTX.fillStyle=bodyGrad; CTX.fill();
-
-  // Borda dourada
-  CTX.strokeStyle='#c8963a'; CTX.lineWidth=2; CTX.stroke();
-  CTX.shadowBlur=0;
-
-  // Rosto
-  CTX.beginPath(); CTX.arc(0,-s*.15,s*.55,0,Math.PI*2);
-  CTX.fillStyle='#c8845a'; CTX.fill();
-
-  // Olhos
-  CTX.fillStyle='#1a0808';
-  CTX.beginPath(); CTX.ellipse(-s*.2,-s*.12,s*.1,s*.11,0,0,Math.PI*2); CTX.fill();
-  CTX.beginPath(); CTX.ellipse(s*.2,-s*.12,s*.1,s*.11,0,0,Math.PI*2); CTX.fill();
-  CTX.fillStyle='#fff';
-  CTX.beginPath(); CTX.arc(-s*.15,-s*.17,s*.04,0,Math.PI*2); CTX.fill();
-  CTX.beginPath(); CTX.arc(s*.25,-s*.17,s*.04,0,Math.PI*2); CTX.fill();
-
-  // Sorriso
-  CTX.beginPath(); CTX.arc(0,-s*.05,s*.2,0.2,Math.PI-.2);
-  CTX.strokeStyle='#8a3020'; CTX.lineWidth=s*.06; CTX.lineCap='round'; CTX.stroke();
-
-  // Coroa
-  CTX.font=`${s*.7}px serif`; CTX.textAlign='center'; CTX.textBaseline='middle';
-  CTX.fillText('👑', 0, -s*1.1);
-
-  // Pulso de brilho
-  const pulse=(Math.sin(Date.now()/500)+1)/2;
-  CTX.beginPath(); CTX.arc(0,0,s+3,0,Math.PI*2);
-  CTX.strokeStyle=`rgba(232,112,168,${0.3+pulse*0.5})`;
-  CTX.lineWidth=2; CTX.stroke();
-
-  CTX.restore();
-}
-
-function roundRect(ctx, x, y, w, h, r) {
+function rRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
   ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
   ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
   ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
   ctx.closePath();
 }
 
-function createLinGrad(ctx,x1,y1,x2,y2,c1,c2){
+function lGrad(ctx,x1,y1,x2,y2,c1,c2) {
   const g=ctx.createLinearGradient(x1,y1,x2,y2);
   g.addColorStop(0,c1); g.addColorStop(1,c2); return g;
 }
 
+function drawBoard() {
+  if (!CANVAS||!CTX||!SEASON) return;
+  const cur = PROF?.current_house || 0;
+  const total = SEASON.total_houses;
+  const t = Date.now();
+
+  CTX.clearRect(0,0,CANVAS_W,CANVAS_H);
+
+  /* Linha de trilha */
+  if (CELL_POSITIONS.length > 1) {
+    CTX.save();
+    CTX.setLineDash([5,9]);
+    CTX.lineWidth = 2.5;
+    CTX.strokeStyle = 'rgba(200,146,42,0.15)';
+    CTX.lineCap = 'round';
+    CTX.beginPath();
+    CTX.moveTo(CELL_POSITIONS[0].x, CELL_POSITIONS[0].y);
+    CELL_POSITIONS.forEach(p => CTX.lineTo(p.x, p.y));
+    CTX.stroke();
+    CTX.setLineDash([]);
+    CTX.restore();
+  }
+
+  /* Casas */
+  CELL_POSITIONS.forEach((pos, i) => {
+    const num    = i + 1;
+    const prize  = PRIZES.find(p => p.house_number === num);
+    const isWon  = CLAIMS.some(c => c.house_number === num);
+    const animCur = Math.round(ANIM_POS) || cur;
+    const isCur  = num === animCur;
+    const isPast = num < (ANIM_POS || cur);
+    const hw = pos.w/2, hh = pos.h/2;
+    const rad = pos.w * 0.17;
+
+    CTX.save();
+    CTX.translate(pos.x, pos.y);
+
+    /* Sombra */
+    CTX.shadowColor = isCur ? 'rgba(224,64,122,0.6)' : prize ? 'rgba(200,146,42,0.3)' : 'rgba(0,0,0,0.4)';
+    CTX.shadowBlur  = isCur ? 18 : prize ? 10 : 5;
+
+    /* Fundo */
+    rRect(CTX,-hw,-hh,pos.w,pos.h,rad);
+    let fill;
+    if (isCur)         fill = lGrad(CTX,-hw,-hh,hw,hh,'rgba(196,32,88,0.55)','rgba(100,8,40,0.35)');
+    else if (isWon&&prize) fill = lGrad(CTX,-hw,-hh,hw,hh,'rgba(200,146,42,0.40)','rgba(138,98,34,0.18)');
+    else if (prize)    fill = lGrad(CTX,-hw,-hh,hw,hh,'rgba(200,146,42,0.18)','rgba(42,14,72,0.15)');
+    else if (isPast)   fill = 'rgba(200,146,42,0.07)';
+    else               fill = 'rgba(255,255,255,0.04)';
+    CTX.fillStyle = fill;
+    CTX.fill();
+    CTX.shadowBlur = 0;
+
+    /* Highlight interno topo */
+    if (prize || isCur) {
+      rRect(CTX,-hw,-hh,pos.w,pos.h*0.45,rad);
+      CTX.fillStyle = 'rgba(255,255,255,0.06)';
+      CTX.fill();
+    }
+
+    /* Borda */
+    rRect(CTX,-hw,-hh,pos.w,pos.h,rad);
+    if      (isCur)           CTX.strokeStyle = 'rgba(240,112,160,0.95)';
+    else if (isWon && prize)  CTX.strokeStyle = 'rgba(200,146,42,0.75)';
+    else if (prize)           CTX.strokeStyle = 'rgba(200,146,42,0.40)';
+    else                      CTX.strokeStyle = 'rgba(255,255,255,0.07)';
+    CTX.lineWidth = isCur ? 2.5 : 1.5;
+    CTX.stroke();
+
+    /* Efeito pulsar borda casa atual */
+    if (isCur) {
+      const p = (Math.sin(t/350)+1)/2;
+      rRect(CTX,-hw-3,-hh-3,pos.w+6,pos.h+6,rad+2);
+      CTX.strokeStyle = `rgba(240,112,160,${0.25+p*0.35})`;
+      CTX.lineWidth = 1;
+      CTX.stroke();
+    }
+
+    /* Ícone */
+    if (prize && !isCur) {
+      CTX.font = `${pos.w*.40}px serif`;
+      CTX.textAlign='center'; CTX.textBaseline='middle';
+      CTX.globalAlpha = isWon ? 1 : 0.88;
+      CTX.fillText(ICONS[prize.prize_type]||'🎁', 0, -pos.h*.08);
+      CTX.globalAlpha = 1;
+    }
+
+    /* Número */
+    CTX.font = `800 ${pos.w*.22}px Nunito,sans-serif`;
+    CTX.textAlign='center'; CTX.textBaseline='middle';
+    CTX.fillStyle = isCur ? '#fff' : (prize ? 'rgba(255,217,128,0.85)' : 'rgba(255,255,255,0.25)');
+    CTX.fillText(num, 0, prize&&!isCur ? pos.h*.30 : 0);
+
+    CTX.restore();
+  });
+
+  /* Avatar Tainá */
+  const houseIdx = (ANIM_POS > 0 ? Math.round(ANIM_POS) : cur);
+  if (houseIdx > 0 && CELL_POSITIONS.length > 0) {
+    const p = CELL_POSITIONS[Math.min(houseIdx-1, CELL_POSITIONS.length-1)];
+    if (p) drawTaina(p.x, p.y - p.h*.52 - 16, p.w * .72, t);
+  }
+}
+
+function drawTaina(x, y, size, t) {
+  const s = size * .50;
+  const bob = Math.sin(t/600) * 2.5;
+  CTX.save();
+  CTX.translate(x, y + bob);
+
+  /* Sombra suave no chão */
+  CTX.save();
+  CTX.scale(1, .25);
+  CTX.beginPath();
+  CTX.arc(0, s*1.4, s*.8, 0, Math.PI*2);
+  CTX.fillStyle = 'rgba(0,0,0,0.3)';
+  CTX.fill();
+  CTX.restore();
+
+  /* Anel de brilho */
+  const pulse = (Math.sin(t/450)+1)/2;
+  CTX.beginPath(); CTX.arc(0, 0, s+5, 0, Math.PI*2);
+  CTX.strokeStyle = `rgba(224,64,122,${0.3+pulse*0.5})`;
+  CTX.lineWidth = 2; CTX.stroke();
+
+  /* Corpo (círculo) */
+  const bg = CTX.createRadialGradient(-s*.2,-s*.3,0,0,0,s);
+  bg.addColorStop(0,'#d85090'); bg.addColorStop(1,'#6a1030');
+  CTX.beginPath(); CTX.arc(0,0,s,0,Math.PI*2);
+  CTX.fillStyle=bg; CTX.fill();
+  CTX.strokeStyle='rgba(200,146,42,0.8)'; CTX.lineWidth=2; CTX.stroke();
+
+  /* Rosto */
+  CTX.beginPath(); CTX.arc(0,-s*.12,s*.56,0,Math.PI*2);
+  CTX.fillStyle='#c8845a'; CTX.fill();
+
+  /* Olhos */
+  [[-s*.2,-s*.1],[s*.2,-s*.1]].forEach(([ox,oy])=>{
+    CTX.beginPath(); CTX.ellipse(ox,oy,s*.11,s*.12,0,0,Math.PI*2);
+    CTX.fillStyle='#0d0505'; CTX.fill();
+    CTX.beginPath(); CTX.arc(ox+s*.04,oy-s*.04,s*.04,0,Math.PI*2);
+    CTX.fillStyle='white'; CTX.fill();
+  });
+
+  /* Sorriso */
+  CTX.beginPath(); CTX.arc(0,0,s*.22,0.3,Math.PI-.3);
+  CTX.strokeStyle='#8a3020'; CTX.lineWidth=s*.065; CTX.lineCap='round'; CTX.stroke();
+
+  /* Coroa */
+  CTX.font=`${s*.72}px serif`; CTX.textAlign='center'; CTX.textBaseline='middle';
+  CTX.fillText('👑',0,-s*1.15);
+
+  CTX.restore();
+}
+
 function initCanvas() {
   CANVAS = document.getElementById('game-canvas');
-  CTX = CANVAS.getContext('2d');
-  const section = CANVAS.parentElement;
-  CANVAS_W = section.clientWidth || 390;
+  CTX    = CANVAS.getContext('2d');
+  CANVAS_W = CANVAS.parentElement.clientWidth || 390;
 
-  const total = SEASON?.total_houses || 20;
-  const { positions, totalH } = buildSpiralPositions(total, CANVAS_W);
+  const { positions, totalH } = buildLayout(SEASON?.total_houses || 20, CANVAS_W);
   CELL_POSITIONS = positions;
   CANVAS_H = totalH;
-  CANVAS.width = CANVAS_W;
+  CANVAS.width  = CANVAS_W;
   CANVAS.height = CANVAS_H;
   CANVAS.style.height = CANVAS_H + 'px';
 
-  // Loop de animação
   cancelAnimationFrame(ANIM_RAF);
-  function animLoop() {
-    drawBoard();
-    ANIM_RAF = requestAnimationFrame(animLoop);
-  }
-  animLoop();
+  const loop = () => { drawBoard(); ANIM_RAF = requestAnimationFrame(loop); };
+  loop();
 }
 
-// Animação de avanço suave
-function animateMove(from, to, onDone) {
-  ANIM_POS = from;
-  ANIM_TARGET = to;
+function animateMove(from, to, done) {
+  ANIM_POS = from || 0;
   const step = () => {
-    if (ANIM_POS < ANIM_TARGET) {
-      ANIM_POS = Math.min(ANIM_POS + 0.06, ANIM_TARGET);
-      setTimeout(step, 16);
-    } else {
-      ANIM_POS = to;
-      if (onDone) onDone();
-    }
+    ANIM_POS += 0.055;
+    if (ANIM_POS < to) setTimeout(step, 16);
+    else { ANIM_POS = to; if (done) done(); }
   };
   step();
 }
 
-// ═══════════════════════════════════════
-// RENDER GAME
-// ═══════════════════════════════════════
+/* ─── RENDER GAME ─── */
 function renderGame() {
   if (!SEASON) return;
   const cur = PROF?.current_house || 0;
   const tot = SEASON.total_houses;
   const name = PROF?.full_name || USER?.email || '?';
 
-  el('uname').textContent = name.split(' ')[0];
-  el('user-coins').textContent = cur;
-  el('s-name').textContent = SEASON.name;
-  el('s-cur').textContent = cur;
-  el('s-tot').textContent = tot;
-  el('s-fill').style.width = Math.round((cur/tot)*100) + '%';
+  el('uname').textContent       = name.split(' ')[0];
+  el('user-coins').textContent  = cur;
+  el('s-name').textContent      = SEASON.name;
+  el('s-cur').textContent       = cur;
+  el('s-tot').textContent       = tot;
+  el('s-fill').style.width      = Math.round((cur/tot)*100) + '%';
+  ANIM_POS = cur; ANIM_TARGET = cur;
 
-  ANIM_POS = cur;
-  ANIM_TARGET = cur;
   initCanvas();
   renderNextPrize(cur);
   renderMarcos(cur);
@@ -1097,9 +1971,9 @@ function renderGame() {
 
 function renderNextPrize(cur) {
   const next = PRIZES.find(p => p.house_number > cur);
-  const bar = el('next-bar');
+  const bar  = el('next-bar');
   if (!next) { bar.style.display='none'; return; }
-  bar.style.display='flex';
+  bar.style.display = 'flex';
   el('np-icon').textContent = ICONS[next.prize_type] || '🎁';
   el('np-name').textContent = next.prize_name;
   const dist = next.house_number - cur;
@@ -1107,14 +1981,11 @@ function renderNextPrize(cur) {
 }
 
 function renderMarcos(cur) {
-  const strip = el('marcos-strip');
-  strip.innerHTML = '';
-  if (!PRIZES.length) return;
+  const strip = el('marcos-strip'); strip.innerHTML = '';
   PRIZES.forEach(p => {
     const isWon  = CLAIMS.some(c => c.house_number === p.house_number);
     const isNext = !isWon && p.house_number > cur &&
-      !PRIZES.find(pp => !CLAIMS.some(c => c.house_number===pp.house_number) &&
-        pp.house_number > cur && pp.house_number < p.house_number);
+      !PRIZES.find(pp => !CLAIMS.some(c=>c.house_number===pp.house_number) && pp.house_number>cur && pp.house_number<p.house_number);
     const m = document.createElement('div');
     m.className = 'marco ' + (isWon?'won':isNext?'next':'locked');
     m.innerHTML = `
@@ -1125,15 +1996,12 @@ function renderMarcos(cur) {
   });
 }
 
-// ═══════════════════════════════════════
-// USAR CÓDIGO
-// ═══════════════════════════════════════
+/* ─── USAR CÓDIGO ─── */
 async function doUse() {
   const code = v('code-inp').toUpperCase().trim();
   const fb = el('cfb'), btn = el('b-use');
   if (!code) { setFb('Insira um código.','err'); return; }
   btn.disabled=true; btn.textContent='⌛'; fb.className='cfb';
-
   try {
     const { data, error } = await db.rpc('use_purchase_code', { p_code: code });
     if (error) throw error;
@@ -1142,31 +2010,23 @@ async function doUse() {
     } else {
       el('code-inp').value = '';
       setFb(`✨ Avançou ${data.houses_advanced} ${data.houses_advanced===1?'casa':'casas'}!`, 'ok');
-      const fromH = data.from_house, toH = data.to_house;
+      const toH = data.to_house, fromH = data.from_house;
       if (PROF) PROF.current_house = toH;
-      el('s-cur').textContent = toH;
-      el('s-fill').style.width = Math.round((toH/(SEASON?.total_houses||20))*100)+'%';
+      el('s-cur').textContent  = toH;
+      el('s-fill').style.width = Math.round((toH/(SEASON?.total_houses||20))*100) + '%';
       el('user-coins').textContent = toH;
-
       await loadMoves(); await loadClaims();
       renderNextPrize(toH); renderMarcos(toH);
-
-      // Animação do avatar
       animateMove(fromH, toH, () => {
         if (data.prizes?.length) setTimeout(() => showModal(data.prizes), 400);
         else if (data.finished)  setTimeout(() => showFinished(), 400);
       });
     }
-  } catch(e) {
-    setFb('Erro de conexão. Tente novamente.','err');
-    console.error(e);
-  }
+  } catch(e) { setFb('Erro de conexão. Tente novamente.','err'); console.error(e); }
   btn.disabled=false; btn.textContent='🎲 Usar';
 }
 
-// ═══════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════
+/* ─── MODAL ─── */
 function showModal(prizes) {
   el('m-sub').textContent = prizes.length===1
     ? `Você chegou à casa ${prizes[0].house} e conquistou:`
@@ -1181,49 +2041,44 @@ function showModal(prizes) {
   el('modal').classList.add('open');
   confetti();
 }
-
 function showFinished() {
-  el('m-sub').textContent='Tabuleiro completo! 🎊 A equipe Scarlat vai entrar em contato!';
-  el('m-prizes').innerHTML='<div class="prize-reveal"><span class="pr-icon">👑</span><div class="pr-name">Campeã da Temporada!</div></div>';
+  el('m-sub').textContent = 'Tabuleiro completo! 🎊 A equipe Scarlat vai entrar em contato!';
+  el('m-prizes').innerHTML = '<div class="prize-reveal"><span class="pr-icon">👑</span><div class="pr-name">Campeã da Temporada!</div></div>';
   el('modal').classList.add('open'); confetti();
 }
-
 function closeModal() { el('modal').classList.remove('open'); }
 
 function confetti() {
-  const ems=['✨','💎','👑','🌸','💖','⭐','🎀','💫','🌟','🎊','🌺','💐','🦋','🪷'];
-  for (let i=0;i<22;i++) {
-    setTimeout(()=>{
-      const c=document.createElement('div');
-      c.className='cf'; c.textContent=ems[Math.floor(Math.random()*ems.length)];
-      c.style.cssText=`left:${Math.random()*100}vw;top:-30px;--d:${1.5+Math.random()*1.8}s`;
-      document.body.appendChild(c);
-      setTimeout(()=>c.remove(),4500);
-    },i*70);
-  }
+  const ems=['✨','💎','👑','🌸','💖','⭐','🎀','💫','🌟','🎊','🌺','💐','🦋','🪷','🌹','💍'];
+  for (let i=0;i<24;i++) setTimeout(()=>{
+    const c=document.createElement('div');
+    c.className='cf';
+    c.textContent=ems[Math.floor(Math.random()*ems.length)];
+    c.style.cssText=`left:${Math.random()*100}vw;top:-30px;--d:${1.6+Math.random()*1.8}s`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),5000);
+  },i*65);
 }
 
-// ═══════════════════════════════════════
-// HISTÓRICO
-// ═══════════════════════════════════════
+/* ─── HISTÓRICO ─── */
 async function renderHist() {
   await loadClaims(); await loadMoves();
-  const pl=el('pr-list');
-  pl.innerHTML=CLAIMS.length?CLAIMS.map(c=>{
-    const p=c.house_prizes,date=fmt(c.claimed_at);
-    const badge=c.delivered
-      ?'<span style="font-size:10px;background:rgba(200,150,58,.1);color:#e8c06a;padding:2px 8px;border-radius:6px;font-weight:700">✅ Entregue</span>'
-      :'<span style="font-size:10px;background:rgba(200,64,122,.1);color:#e870a8;padding:2px 8px;border-radius:6px;font-weight:700">⏳ Aguardando</span>';
-    return`<div class="hist-item">
+  const pl = el('pr-list');
+  pl.innerHTML = CLAIMS.length ? CLAIMS.map(c=>{
+    const p=c.house_prizes, date=fmt(c.claimed_at);
+    const badge = c.delivered
+      ? '<span style="font-size:10px;background:rgba(200,146,42,.1);color:#ffd980;padding:2px 8px;border-radius:6px;font-weight:800">✅ Entregue</span>'
+      : '<span style="font-size:10px;background:rgba(224,64,122,.1);color:#ffa0c8;padding:2px 8px;border-radius:6px;font-weight:800">⏳ Aguardando</span>';
+    return `<div class="hist-item">
       <div class="hi-icon">${ICONS[p?.prize_type]||'🎁'}</div>
       <div class="hi-info">
         <div class="hi-title">${p?.prize_name||'Prêmio'}</div>
         <div class="hi-sub">Casa ${c.house_number} · ${date} · ${badge}</div>
       </div></div>`;
-  }).join(''):'<div class="empty"><span class="ei">🎁</span><p>Nenhum prêmio ainda.<br>Use um código!</p></div>';
+  }).join('') : '<div class="empty"><span class="ei">🎁</span><p>Nenhum prêmio conquistado ainda.<br>Use um código para avançar!</p></div>';
 
-  const ml=el('mv-list');
-  ml.innerHTML=MOVES.length?MOVES.map(m=>`
+  const ml = el('mv-list');
+  ml.innerHTML = MOVES.length ? MOVES.map(m=>`
     <div class="hist-item">
       <div class="hi-icon">🛍️</div>
       <div class="hi-info">
@@ -1232,81 +2087,70 @@ async function renderHist() {
       </div>
       <div class="hi-badge">+${m.to_house-m.from_house}</div>
     </div>`).join('')
-    :'<div class="empty"><span class="ei">🛍️</span><p>Nenhuma compra ainda.</p></div>';
+    : '<div class="empty"><span class="ei">🛍️</span><p>Nenhuma compra registrada ainda.</p></div>';
 }
 
-// ═══════════════════════════════════════
-// ADMIN
-// ═══════════════════════════════════════
+/* ─── ADMIN ─── */
 async function adminCreate() {
-  const code=v('a-code').toUpperCase().trim();
-  const houses=parseInt(v('a-houses'))||1;
-  const val=parseFloat(v('a-val'))||null;
-  const desc=v('a-desc').trim()||null;
-  const m=el('a-msg');
-  if(code.length<6){setMsg(m,'Código precisa ter pelo menos 6 caracteres.','err');return;}
-  const{data,error}=await db.rpc('admin_create_code',{
-    p_plain_code:code,p_houses_to_advance:houses,
-    p_purchase_value:val,p_purchase_description:desc
-  });
-  if(error||!data?.success){setMsg(m,data?.error||error?.message||'Erro.','err');}
-  else{
+  const code=v('a-code').toUpperCase().trim(), houses=parseInt(v('a-houses'))||1;
+  const val=parseFloat(v('a-val'))||null, desc=v('a-desc').trim()||null, m=el('a-msg');
+  if (code.length<6) { setMsg(m,'Código precisa ter pelo menos 6 caracteres.','err'); return; }
+  const {data,error}=await db.rpc('admin_create_code',{p_plain_code:code,p_houses_to_advance:houses,p_purchase_value:val,p_purchase_description:desc});
+  if (error||!data?.success) setMsg(m,data?.error||error?.message||'Erro.','err');
+  else {
     el('code-disp').style.display='block';
     el('code-disp-val').textContent=code;
     m.style.display='none';
-    el('a-code').value='';el('a-desc').value='';
+    el('a-code').value=''; el('a-desc').value='';
     await renderAdmin();
   }
 }
 
 async function renderAdmin() {
-  const{data:clients}=await db.from('profiles').select('*').eq('role','client').order('current_house',{ascending:false});
+  const {data:clients}=await db.from('profiles').select('*').eq('role','client').order('current_house',{ascending:false});
   el('a-clients').innerHTML=clients?.length?`
     <table class="ctable">
       <thead><tr><th>Nome</th><th>Casa</th><th>R$</th></tr></thead>
       <tbody>${clients.map(c=>`
         <tr><td>${c.full_name||c.id.slice(0,8)}</td>
         <td><span class="hb">${c.current_house||0}</span></td>
-        <td style="font-size:12px;color:var(--txt3)">${(c.total_purchases_value||0).toFixed(0)}</td></tr>
+        <td style="font-size:12px;color:var(--t3)">${(c.total_purchases_value||0).toFixed(0)}</td></tr>
       `).join('')}</tbody></table>`
-    :'<p style="font-size:13px;color:var(--txt3)">Nenhuma cliente ainda.</p>';
+    :'<p style="font-size:13px;color:var(--t3)">Nenhuma cliente ainda.</p>';
 
-  const{data:pend}=await db.from('prize_claims')
-    .select('*,profiles(full_name),house_prizes(prize_name,prize_type)')
-    .eq('delivered',false).order('claimed_at');
+  const {data:pend}=await db.from('prize_claims').select('*,profiles(full_name),house_prizes(prize_name,prize_type)').eq('delivered',false).order('claimed_at');
   el('a-pending').innerHTML=pend?.length?pend.map(p=>`
-    <div class="hist-item" style="margin:0 0 8px">
+    <div class="hist-item" style="margin:0 0 9px">
       <div class="hi-icon">${ICONS[p.house_prizes?.prize_type]||'🎁'}</div>
       <div class="hi-info">
         <div class="hi-title">${p.house_prizes?.prize_name||'Prêmio'}</div>
         <div class="hi-sub">${p.profiles?.full_name||'?'} · Casa ${p.house_number} · ${fmt(p.claimed_at)}</div>
       </div>
       <button class="del-btn" onclick="deliver('${p.id}')">✅ Entregar</button>
-    </div>`).join(''):'<p style="font-size:13px;color:var(--txt3)">✅ Nenhum pendente.</p>';
+    </div>`).join('')
+    :'<p style="font-size:13px;color:var(--t3)">✅ Nenhum pendente.</p>';
 
-  const{data:audit}=await db.from('audit_log').select('*').order('created_at',{ascending:false}).limit(15);
+  const {data:audit}=await db.from('audit_log').select('*').order('created_at',{ascending:false}).limit(15);
   el('a-audit').innerHTML=audit?.length?audit.map(a=>`
-    <div class="hist-item" style="margin:0 0 8px;padding:9px 12px">
-      <div class="hi-icon" style="font-size:16px">${EV[a.event_type]||'📋'}</div>
+    <div class="hist-item" style="margin:0 0 8px;padding:10px 13px">
+      <div class="hi-icon" style="font-size:17px">${EV[a.event_type]||'📋'}</div>
       <div class="hi-info">
         <div class="hi-title" style="font-size:12px">${a.event_type.replace(/_/g,' ')}</div>
         <div class="hi-sub">${fmt(a.created_at)}</div>
       </div></div>`).join('')
-    :'<p style="font-size:13px;color:var(--txt3)">Nenhuma atividade.</p>';
+    :'<p style="font-size:13px;color:var(--t3)">Nenhuma atividade ainda.</p>';
 }
 
-async function deliver(id){
-  const{data,error}=await db.rpc('admin_deliver_prize',{p_claim_id:id});
-  if(error||!data?.success)alert(data?.error||'Erro.');
+async function deliver(id) {
+  const {data,error}=await db.rpc('admin_deliver_prize',{p_claim_id:id});
+  if (error||!data?.success) alert(data?.error||'Erro.');
   else renderAdmin();
 }
 
-// ═══════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════
-const el=id=>document.getElementById(id);
-const v=id=>el(id)?.value?.trim()||'';
-const fmt=d=>new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+/* ─── UTILS ─── */
+const el  = id => document.getElementById(id);
+const v   = id => el(id)?.value?.trim() || '';
+const fmt = d  => new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
 function setMsg(el,txt,type){el.textContent=txt;el.className='amsg'+(type?' '+type:'');if(!txt)el.style.display='none';}
 function setFb(txt,type){const f=el('cfb');f.textContent=txt;f.className='cfb '+type;}
 </script>
