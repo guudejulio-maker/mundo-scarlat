@@ -85,7 +85,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
 @keyframes dotB{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.5);opacity:1}}
 
 /* ─── AUTH ─── */
-#page-auth{flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;min-height:100vh}
+#page-auth{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;min-height:100vh}
 #page-auth.active{display:flex}
 .auth-hero{text-align:center;margin-bottom:36px}
 .auth-gem{font-size:70px;display:block;filter:drop-shadow(0 0 24px rgba(200,146,42,.6));animation:gemB 3s ease-in-out infinite}
@@ -825,23 +825,14 @@ function createStars() {
 addEventListener('DOMContentLoaded', async () => {
   createStars();
   setTimeout(() => el('loading').classList.add('gone'), 2200);
-
-  // Escuta mudanças de login/logout sempre, mesmo quando já existe sessão ativa.
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    if (session?.user) { await boot(session.user); return; }
+  } catch(e) {}
   db.auth.onAuthStateChange(async (ev, s) => {
     if (ev === 'SIGNED_IN' && s?.user) await boot(s.user);
     if (ev === 'SIGNED_OUT') showAuth();
   });
-
-  try {
-    const { data: { session } } = await db.auth.getSession();
-    if (session?.user) {
-      await boot(session.user);
-    } else {
-      showAuth();
-    }
-  } catch(e) {
-    showAuth();
-  }
 });
 
 async function boot(user) {
@@ -888,11 +879,22 @@ async function doLogin() {
   const email=v('l-email'),pass=v('l-pass'),btn=el('b-login'),m=el('m-login');
   if(!email||!pass){setMsg(m,'Preencha e-mail e senha.','err');return;}
   btn.disabled=true;btn.textContent='Entrando…';
+  setMsg(m,'','');
   try {
-    const { error } = await db.auth.signInWithPassword({ email, password: pass });
+    const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
     if (error) throw error;
+
+    // Não depende só do evento SIGNED_IN. Em alguns deploys o evento demora/falha
+    // e o botão fica preso em "Entrando...". Aqui entramos direto se o Auth validou.
+    const user = data?.user || (await db.auth.getUser()).data?.user;
+    if (user) {
+      await boot(user);
+      return;
+    }
+    throw new Error('Login validado, mas usuário não retornou.');
   } catch(e) {
-    setMsg(m,e.message?.includes('Invalid')?'E-mail ou senha incorretos.':(e.message||'Erro.'),'err');
+    setMsg(m,e.message?.includes('Invalid')?'E-mail ou senha incorretos.':(e.message||'Erro ao entrar.'));
+    m.className='amsg err';
     btn.disabled=false;btn.textContent='✨ Entrar no Mundo Scarlat';
   }
 }
@@ -913,89 +915,54 @@ async function doOut() { await db.auth.signOut(); }
 /* ════════════════════════════════════════════
    NAVEGAÇÃO — páginas separadas via hash
 ════════════════════════════════════════════ */
-function hideAllPages() {
-  document.querySelectorAll('.page').forEach(p => {
+function hideAllPages(){
+  document.querySelectorAll('.page').forEach(p=>{
     p.classList.remove('active');
-    p.style.display = 'none';
+    p.style.display='none';
   });
 }
 
 function showAuth() {
-  USER = null;
-  PROF = null;
   hideAllPages();
-
-  const sa = el('page-auth');
-  if (sa) {
-    sa.style.display = 'flex';
-    sa.classList.add('active');
-  }
-
-  const nav = el('nav');
-  if (nav) nav.style.display = 'none';
-
-  if (location.hash !== '#/login') history.replaceState(null, '', '#/login');
+  const sa=el('page-auth');
+  sa.style.display='flex';
+  sa.classList.add('active');
+  el('nav').style.display='none';
+  USER=null;PROF=null;
+  if(location.hash !== '#/login') history.replaceState(null,'','#/login');
 }
 
 function showLoggedIn() {
-  hideAllPages();
-
-  const nav = el('nav');
-  if (nav) nav.style.display = 'block';
-
   const adminBtn = el('nb-admin');
-  if (adminBtn) adminBtn.style.display = PROF?.role === 'admin' ? 'flex' : 'none';
-
-  go('lobby', true);
+  if(adminBtn) adminBtn.style.display = PROF?.role === 'admin' ? 'flex' : 'none';
+  el('nav').style.display='block';
+  go('lobby');
 }
 
-function go(page, replace = false) {
-  if (!USER && page !== 'auth' && page !== 'login') {
-    showAuth();
-    return;
-  }
-
-  const normalized = page === 'login' ? 'auth' : page;
+function go(page) {
+  if(!USER && page !== 'auth' && page !== 'login') { showAuth(); return; }
   hideAllPages();
-
-  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('on'));
-
-  const pg = el('page-' + normalized);
-  if (!pg) return;
-
-  pg.style.display = normalized === 'auth' ? 'flex' : 'block';
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
+  const pg=el('page-'+page);
+  if(!pg){ console.warn('Página não encontrada:', page); return; }
+  pg.style.display = page === 'auth' ? 'flex' : 'block';
   pg.classList.add('active');
-
-  const nav = el('nav');
-  if (nav) nav.style.display = normalized === 'auth' ? 'none' : 'block';
-
-  const adminBtn = el('nb-admin');
-  if (adminBtn) adminBtn.style.display = PROF?.role === 'admin' ? 'flex' : 'none';
-
-  const nb = el('nb-' + normalized);
-  if (nb) nb.classList.add('on');
-
-  const targetHash = '#/' + (normalized === 'auth' ? 'login' : normalized);
-  if (location.hash !== targetHash) {
-    if (replace) history.replaceState(null, '', targetHash);
-    else history.pushState(null, '', targetHash);
-  }
-
-  window.scrollTo(0, 0);
+  const nb=el('nb-'+page);if(nb)nb.classList.add('on');
+  if(location.hash !== '#/'+page) history.replaceState(null,'','#/'+page);
+  window.scrollTo(0,0);
 
   // Render por página
-  if (normalized === 'lobby')      renderLobby();
-  if (normalized === 'premios')    renderPrizesPage();
-  if (normalized === 'tabuleiro')  renderBoardPage();
-  if (normalized === 'historico')  renderHistory();
-  if (normalized === 'admin')      { adminTab('codigos'); renderAdminData(); }
+  if(page==='lobby')      renderLobby();
+  if(page==='premios')    renderPrizesPage();
+  if(page==='tabuleiro')  renderBoardPage();
+  if(page==='historico')  renderHistory();
+  if(page==='admin')      { adminTab('codigos'); renderAdminData(); }
 }
 
 // Hash routing no carregamento
 window.addEventListener('popstate', () => {
   const hash = location.hash.replace('#/','') || 'lobby';
-  if (!USER || hash === 'login') showAuth();
-  else go(hash, true);
+  if(USER && hash !== 'login') go(hash);
 });
 
 /* ════════════════════════════════════════════
