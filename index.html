@@ -214,14 +214,31 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
 
 /* ─── TABULEIRO ─── */
 .board-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
-.board-season-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--gold2)}
-.board-pos-pill{display:flex;align-items:center;gap:6px;background:var(--g2);border:1px solid var(--b1);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:800;color:var(--gold3)}
-.board-rolls-pill{display:flex;align-items:center;gap:5px;background:rgba(224,64,122,.12);border:1px solid rgba(224,64,122,.3);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:800;color:var(--blush)}
-.board-wrap{margin:0 14px 14px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(200,146,42,.28);border-radius:30px;overflow:hidden;position:relative;padding:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 20px 40px rgba(0,0,0,.35)}
-.board-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 18%,rgba(224,64,122,.10),transparent 38%),radial-gradient(circle at 50% 80%,rgba(200,146,42,.07),transparent 42%);pointer-events:none}
-.board-wrap::after{content:'';position:absolute;inset:14px;border-radius:24px;border:1px solid rgba(255,255,255,.04);pointer-events:none}
-#board-canvas{display:block;width:100%;height:auto;position:relative;z-index:1}
-.board-play-btn{margin:0 14px 14px;width:calc(100% - 28px);padding:18px;border:none;border-radius:var(--r2);cursor:pointer;background:linear-gradient(135deg,var(--rose2),var(--rose),var(--ruby2));color:#fff;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;box-shadow:var(--srose);transition:all .25s;position:relative;overflow:hidden}
+.board-season-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--gold3);text-shadow:0 0 18px rgba(200,146,42,.22)}
+.board-pos-pill{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.035));border:1px solid rgba(200,146,42,.28);border-radius:22px;padding:8px 14px;font-size:13px;font-weight:900;color:var(--gold3);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.board-rolls-pill{display:flex;align-items:center;gap:5px;background:rgba(224,64,122,.16);border:1px solid rgba(224,64,122,.35);border-radius:22px;padding:8px 14px;font-size:13px;font-weight:900;color:var(--blush)}
+.board-wrap{margin:0 14px 14px;background:linear-gradient(180deg,rgba(74,15,88,.72),rgba(16,2,28,.94));border:1px solid rgba(232,184,74,.34);border-radius:34px;overflow:hidden;position:relative;padding:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 60px rgba(0,0,0,.46),0 0 0 1px rgba(224,64,122,.10)}
+.board-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 8%,rgba(255,160,210,.16),transparent 35%),radial-gradient(circle at 50% 70%,rgba(232,184,74,.10),transparent 42%),linear-gradient(135deg,rgba(255,255,255,.04),transparent 45%);pointer-events:none}
+.board-wrap::after{content:'';position:absolute;inset:12px;border-radius:26px;border:1px solid rgba(255,255,255,.06);pointer-events:none}
+#board-canvas{display:none}
+.board-stage{position:relative;z-index:1;border-radius:28px;padding:16px 14px 14px;min-height:560px;background:radial-gradient(circle at 50% 18%,rgba(224,64,122,.12),transparent 36%),linear-gradient(180deg,rgba(7,1,14,.18),rgba(7,1,14,.46));overflow:hidden}
+.board-stage:before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:38px 38px;opacity:.55;pointer-events:none}
+.board-crown-title{position:relative;text-align:center;margin:2px 0 12px;font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;font-style:italic;color:var(--gold3);text-shadow:0 0 18px rgba(200,146,42,.25)}
+.board-crown-title span{display:block;font-family:'Nunito',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--t3);margin-top:2px}
+.board-progress-card{position:relative;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:0 4px 14px;padding:12px 14px;border-radius:18px;background:rgba(0,0,0,.30);border:1px solid rgba(200,146,42,.16)}
+.board-progress-main{font-size:13px;font-weight:900;color:var(--t1)}
+.board-progress-sub{font-size:11px;color:var(--gold3);margin-top:3px;font-weight:800}.board-progress-percent{font-size:22px;font-weight:900;color:var(--blush)}
+.board-track{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:18px 5px 8px}
+.board-track:before{content:'';position:absolute;inset:37px 30px 50px;border-radius:26px;background:linear-gradient(90deg,transparent,rgba(232,184,74,.16),transparent);filter:blur(10px);pointer-events:none}
+.bcell{position:relative;aspect-ratio:1;border-radius:17px;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(145deg,rgba(98,50,130,.72),rgba(35,12,62,.92));border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 9px 18px rgba(0,0,0,.25);transition:transform .25s,filter .25s}
+.bcell:before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.16),transparent 48%);opacity:.85}.bcell.past{background:linear-gradient(145deg,rgba(102,65,118,.70),rgba(44,20,66,.88));opacity:.78}.bcell.future{opacity:.92}.bcell.special{background:linear-gradient(145deg,rgba(94,44,92,.90),rgba(42,14,74,.96));border-color:rgba(232,184,74,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 22px rgba(232,184,74,.12),0 10px 22px rgba(0,0,0,.28)}
+.bcell.current{transform:scale(1.12);z-index:5;background:linear-gradient(145deg,#fff3ec,#f18ab6 48%,#c42a62);border:2px solid rgba(255,248,232,.96);box-shadow:0 0 0 5px rgba(224,64,122,.24),0 0 30px rgba(224,64,122,.55),0 14px 34px rgba(0,0,0,.36)}
+.bcell-num{position:relative;font-size:18px;font-weight:1000;color:rgba(255,255,255,.86);text-shadow:0 2px 8px rgba(0,0,0,.38);line-height:1}.bcell.current .bcell-num{color:#4a0820;font-size:22px;text-shadow:none}.bcell.special .bcell-num{color:var(--gold3)}
+.bcell-ic{position:relative;font-size:18px;line-height:1;margin-bottom:3px;filter:drop-shadow(0 0 6px rgba(232,184,74,.28))}.bcell:not(.special) .bcell-ic{display:none}
+.bavatar{position:absolute;top:-29px;left:50%;transform:translateX(-50%);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 25%,#ffb2d3,#d85090 55%,#6a1030);border:3px solid var(--gold2);font-size:23px;box-shadow:0 0 0 5px rgba(200,146,42,.14),0 0 26px rgba(224,64,122,.55);animation:avaBob 2s ease-in-out infinite}@keyframes avaBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
+.board-road{position:absolute;height:4px;border-radius:10px;background:repeating-linear-gradient(90deg,rgba(232,184,74,.26) 0 12px,transparent 12px 22px);pointer-events:none;opacity:.9;filter:drop-shadow(0 0 8px rgba(232,184,74,.2))}
+.board-next-box{position:relative;margin:14px 4px 0;padding:12px 14px;border-radius:18px;background:linear-gradient(135deg,rgba(200,146,42,.13),rgba(224,64,122,.08));border:1px solid rgba(200,146,42,.22);display:flex;gap:10px;align-items:center}.board-next-ic{font-size:28px}.board-next-txt{font-size:12px;color:var(--t2);line-height:1.35}.board-next-txt b{display:block;color:var(--gold3);font-size:14px;margin-bottom:2px}
+.board-play-btn{margin:0 14px 14px;width:calc(100% - 28px);padding:20px;border:none;border-radius:26px;cursor:pointer;background:linear-gradient(135deg,#f59bc0,var(--rose),#b92b61);color:#fff;font-family:'Nunito',sans-serif;font-size:18px;font-weight:1000;box-shadow:0 12px 36px rgba(224,64,122,.42),inset 0 1px 0 rgba(255,255,255,.25);transition:all .25s;position:relative;overflow:hidden}
 .board-play-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.25),transparent 55%);border-radius:inherit}
 .board-play-btn:disabled{opacity:.4;cursor:not-allowed}
 
@@ -507,6 +524,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
   </div>
   <div class="board-wrap">
     <canvas id="board-canvas"></canvas>
+    <div id="board-dom" class="board-stage"></div>
   </div>
   <button class="board-play-btn" id="board-btn-play" onclick="doRollDice()">
     🎲 Jogar Dado — <span id="board-rolls-txt">0</span> jogadas
@@ -1033,311 +1051,105 @@ function renderPrizesPage() {
 }
 
 /* ════════════════════════════════════════════
-   TABULEIRO CANVAS — ESPIRAL DINÂMICA
+   TABULEIRO DOM — CARACOL PREMIUM SEQUENCIAL
+   Janela curta, clara e bonita: atual no centro, passado e futuro ao redor
 ════════════════════════════════════════════ */
-let SPIRAL_COORDS = [];
+const VIEW_SIZE = 25;
+const VIEW_RADIUS = 12;
+const BOARD_PATH_SLOTS = [
+  0,1,2,3,4,
+  9,8,7,6,5,
+  10,11,12,13,14,
+  19,18,17,16,15,
+  20,21,22,23,24
+];
 
-function ensureSpiralCoords(total){
-  if(SPIRAL_COORDS.length > total) return;
-  SPIRAL_COORDS = [null];
-  let x = 0, y = 0;
-  let dx = 1, dy = 0;
-  let segmentLen = 1, segmentUsed = 0, turns = 0;
-  for(let n=1; n<=total; n++){
-    SPIRAL_COORDS[n] = {x,y};
-    x += dx; y += dy; segmentUsed++;
-    if(segmentUsed === segmentLen){
-      segmentUsed = 0;
-      const ndx = -dy;
-      const ndy = dx;
-      dx = ndx; dy = ndy;
-      turns++;
-      if(turns % 2 === 0) segmentLen++;
-    }
-  }
+function visibleBoardNumbers(total,current){
+  const safeTotal=Math.max(1,total||700);
+  const safeCurrent=Math.max(1,Math.min(current||1,safeTotal));
+  let start=safeCurrent-VIEW_RADIUS;
+  let end=safeCurrent+VIEW_RADIUS;
+  if(start<1){end+=(1-start);start=1;}
+  if(end>safeTotal){start-=(end-safeTotal);end=safeTotal;}
+  start=Math.max(1,start);
+  const nums=[];
+  for(let n=start;n<=end;n++) nums.push(n);
+  while(nums.length<VIEW_SIZE && nums[0]>1) nums.unshift(nums[0]-1);
+  while(nums.length<VIEW_SIZE && nums[nums.length-1]<safeTotal) nums.push(nums[nums.length-1]+1);
+  return nums.slice(0,VIEW_SIZE);
 }
 
-function buildSpiralViewport(total,current,w){
-  ensureSpiralCoords(total);
-  const safeCurrent = Math.max(1, Math.min(current||1, total||1));
-  const centerCoord = SPIRAL_COORDS[safeCurrent] || {x:0,y:0};
-  const radius = 3; // 7x7 visível
-  const pad = 18;
-  const grid = radius * 2 + 1;
-  const cellW = Math.floor((w - pad*2) / grid);
-  const totalH = cellW * grid + pad*2;
-  const centerX = w / 2;
-  const centerY = totalH / 2;
-  const positions = [];
-
-  for(let num=1; num<=total; num++){
-    const c = SPIRAL_COORDS[num];
-    if(!c) continue;
-    const rx = c.x - centerCoord.x;
-    const ry = c.y - centerCoord.y;
-    if(Math.abs(rx) <= radius && Math.abs(ry) <= radius){
-      positions.push({
-        num,
-        gx: rx,
-        gy: ry,
-        x: centerX + rx * cellW,
-        y: centerY - ry * cellW,
-        w: cellW - 8,
-        h: cellW - 8
-      });
-    }
-  }
-  positions.sort((a,b)=>a.num-b.num);
-  return { positions, totalH, cellW, radius };
-}
-
-function rRect(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
-  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
-}
-
-function drawBoardFrame() {
-  if(!BC||!BCTX||!WALLET.total_houses) return;
-  const cur = PROF?.current_house || 0;
-  const anim = Math.round(ANIM_POS)||cur||1;
-  const t = Date.now();
-  BCTX.clearRect(0,0,BOARD_W,BOARD_H);
-
-  const panel = BCTX.createLinearGradient(0,0,0,BOARD_H);
-  panel.addColorStop(0,'rgba(44,12,66,.55)');
-  panel.addColorStop(1,'rgba(18,2,32,.18)');
-  BCTX.fillStyle = panel;
-  BCTX.fillRect(0,0,BOARD_W,BOARD_H);
-
-  const midX = BOARD_W/2;
-  const midY = BOARD_H/2;
-  const halo = BCTX.createRadialGradient(midX,midY,6,midX,midY,BOARD_W*.42);
-  halo.addColorStop(0,'rgba(224,64,122,.18)');
-  halo.addColorStop(.45,'rgba(200,146,42,.09)');
-  halo.addColorStop(1,'rgba(0,0,0,0)');
-  BCTX.fillStyle = halo;
-  BCTX.fillRect(0,0,BOARD_W,BOARD_H);
-
-  // grid sutil
-  BCTX.save();
-  BCTX.strokeStyle='rgba(255,255,255,.03)';
-  BCTX.lineWidth=1;
-  const gridStep = Math.max(36, Math.floor(BOARD_W/8));
-  for(let x=gridStep; x<BOARD_W; x+=gridStep){BCTX.beginPath();BCTX.moveTo(x,0);BCTX.lineTo(x,BOARD_H);BCTX.stroke();}
-  for(let y=gridStep; y<BOARD_H; y+=gridStep){BCTX.beginPath();BCTX.moveTo(0,y);BCTX.lineTo(BOARD_W,y);BCTX.stroke();}
-  BCTX.restore();
-
-  // Linha do caminho entre casas visíveis consecutivas
-  if(CELL_POSITIONS.length>1){
-    BCTX.save();
-    BCTX.lineCap='round';
-    BCTX.lineJoin='round';
-    BCTX.strokeStyle='rgba(200,146,42,.22)';
-    BCTX.lineWidth=4;
-    BCTX.setLineDash([8,10]);
-    BCTX.beginPath();
-    BCTX.moveTo(CELL_POSITIONS[0].x,CELL_POSITIONS[0].y);
-    CELL_POSITIONS.forEach(p=>BCTX.lineTo(p.x,p.y));
-    BCTX.stroke();
-    BCTX.setLineDash([]);
-
-    BCTX.strokeStyle='rgba(255,217,128,.06)';
-    BCTX.lineWidth=10;
-    BCTX.beginPath();
-    BCTX.moveTo(CELL_POSITIONS[0].x,CELL_POSITIONS[0].y);
-    CELL_POSITIONS.forEach(p=>BCTX.lineTo(p.x,p.y));
-    BCTX.stroke();
-    BCTX.restore();
-  }
-
-  // Medallion central atrás da casa atual
-  BCTX.save();
-  BCTX.beginPath();
-  BCTX.arc(midX, midY, 36 + Math.sin(t/500)*3, 0, Math.PI*2);
-  const cgrad = BCTX.createRadialGradient(midX,midY,0,midX,midY,42);
-  cgrad.addColorStop(0,'rgba(255,248,232,.85)');
-  cgrad.addColorStop(.55,'rgba(232,184,74,.42)');
-  cgrad.addColorStop(1,'rgba(232,184,74,0)');
-  BCTX.fillStyle = cgrad;
-  BCTX.fill();
-  BCTX.restore();
-
-  CELL_POSITIONS.forEach(pos=>{
-    const num=pos.num;
+function renderBoardDom(){
+  const root=el('board-dom');
+  if(!root) return;
+  const total=Math.max(50,WALLET.total_houses||700);
+  const current=Math.max(1,Math.min(Math.round(ANIM_POS)||WALLET.current_house||PROF?.current_house||1,total));
+  const nums=visibleBoardNumbers(total,current);
+  const pct=Math.round((current/total)*100);
+  const nextSpecial=BOARD_CELLS.filter(c=>c.cell_number>current&&c.cell_type!=='comum').sort((a,b)=>a.cell_number-b.cell_number)[0];
+  const prevSpecial=BOARD_CELLS.filter(c=>c.cell_number<=current&&c.cell_type!=='comum').sort((a,b)=>b.cell_number-a.cell_number)[0];
+  const cellHtml = nums.map((num,i)=>{
+    const visualSlot = BOARD_PATH_SLOTS[i];
     const cell=BOARD_CELLS.find(c=>c.cell_number===num);
-    const isSpecial=cell&&cell.cell_type!=='comum';
-    const isCur=num===anim;
-    const isPast=num<(ANIM_POS||cur);
-    const hw=pos.w/2,hh=pos.h/2,rad=Math.min(18, pos.w*.22);
-
-    BCTX.save();
-    BCTX.translate(pos.x,pos.y);
-
-    const pulse=(Math.sin((t+num*25)/500)+1)/2;
-    BCTX.shadowColor=isCur?'rgba(224,64,122,.65)':isSpecial?'rgba(200,146,42,.35)':'rgba(0,0,0,.28)';
-    BCTX.shadowBlur=isCur?22:isSpecial?12:5;
-
-    rRect(BCTX,-hw,-hh,pos.w,pos.h,rad);
-    let fillGrad=BCTX.createLinearGradient(-hw,-hh,hw,hh);
-    if(isCur){
-      fillGrad.addColorStop(0,'rgba(255,196,220,.98)');
-      fillGrad.addColorStop(1,'rgba(224,64,122,.92)');
-    }else if(isSpecial){
-      fillGrad.addColorStop(0, isPast ? 'rgba(146,110,32,.32)' : 'rgba(74,24,88,.80)');
-      fillGrad.addColorStop(1, isPast ? 'rgba(200,146,42,.22)' : 'rgba(34,8,64,.92)');
-    }else if(isPast){
-      fillGrad.addColorStop(0,'rgba(72,30,84,.76)');
-      fillGrad.addColorStop(1,'rgba(40,16,58,.82)');
-    }else{
-      fillGrad.addColorStop(0,'rgba(88,42,118,.42)');
-      fillGrad.addColorStop(1,'rgba(44,18,60,.56)');
-    }
-    BCTX.fillStyle=fillGrad;
-    BCTX.fill();
-    BCTX.shadowBlur=0;
-
-    rRect(BCTX,-hw,-hh,pos.w,pos.h,rad);
-    BCTX.strokeStyle=isCur?'rgba(255,248,232,.95)':isSpecial?'rgba(232,184,74,.42)':'rgba(255,255,255,.08)';
-    BCTX.lineWidth=isCur?2.8:1.35;
-    BCTX.stroke();
-
-    if(isCur){
-      rRect(BCTX,-hw-4,-hh-4,pos.w+8,pos.h+8,rad+2);
-      BCTX.strokeStyle=`rgba(255,230,245,${.22+pulse*.35})`;
-      BCTX.lineWidth=1.5;
-      BCTX.stroke();
-    }
-
-    // brilho interno topo
-    BCTX.save();
-    BCTX.beginPath();
-    rRect(BCTX,-hw+1,-hh+1,pos.w-2,pos.h*.42,Math.max(8,rad-4));
-    BCTX.clip();
-    const gloss=BCTX.createLinearGradient(0,-hh,0,-hh+pos.h*.42);
-    gloss.addColorStop(0,'rgba(255,255,255,.18)');
-    gloss.addColorStop(1,'rgba(255,255,255,0)');
-    BCTX.fillStyle=gloss;
-    BCTX.fillRect(-hw,-hh,pos.w,pos.h*.45);
-    BCTX.restore();
-
-    // Ícone da casa especial
-    if(isSpecial){
-      BCTX.font=`${Math.max(14,pos.w*.22)}px serif`;
-      BCTX.textAlign='center';BCTX.textBaseline='middle';
-      BCTX.fillText(CELL_ICONS[cell.cell_type]||'⭐',0,-pos.h*.18);
-    }
-
-    // Número
-    BCTX.font=`900 ${Math.max(12,pos.w*.20)}px Nunito,sans-serif`;
-    BCTX.textAlign='center';
-    BCTX.textBaseline='middle';
-    BCTX.fillStyle=isCur?'#3e0a1f':isSpecial?'rgba(255,226,160,.96)':isPast?'rgba(255,231,176,.88)':'rgba(255,255,255,.86)';
-    BCTX.fillText(num,0,isSpecial?pos.h*.18:0);
-
-    BCTX.restore();
-  });
-
-  // Avatar na casa atual
-  const houseIdx=(ANIM_POS>0?Math.round(ANIM_POS):cur);
-  const p=CELL_POSITIONS.find(item=>item.num===houseIdx);
-  if(p) drawAvatar(p.x,p.y-p.h*.72,Math.min(p.w*.78,38),t);
-
-  // Cartela discreta de progresso no rodapé do canvas
-  BCTX.save();
-  const cardW = BOARD_W - 36;
-  const cardH = 52;
-  const cardX = 18;
-  const cardY = BOARD_H - cardH - 14;
-  rRect(BCTX, cardX, cardY, cardW, cardH, 16);
-  BCTX.fillStyle='rgba(7,1,12,.48)';
-  BCTX.fill();
-  BCTX.strokeStyle='rgba(200,146,42,.18)';
-  BCTX.lineWidth=1;
-  BCTX.stroke();
-  BCTX.fillStyle='rgba(255,255,255,.75)';
-  BCTX.font='700 12px Nunito,sans-serif';
-  BCTX.textAlign='left'; BCTX.textBaseline='top';
-  BCTX.fillText(`Casa atual ${anim} de ${WALLET.total_houses || 700}`, cardX+14, cardY+10);
-  const nextSpecial = BOARD_CELLS.filter(c=>c.cell_number>anim && c.cell_type!=='comum').sort((a,b)=>a.cell_number-b.cell_number)[0];
-  BCTX.fillStyle='rgba(255,217,128,.92)';
-  BCTX.font='800 13px Nunito,sans-serif';
-  if(nextSpecial){
-    BCTX.fillText(`Próximo marco: ${nextSpecial.cell_number} ${CELL_ICONS[nextSpecial.cell_type]||''} ${nextSpecial.label||''}`.trim(), cardX+14, cardY+28);
-  }else{
-    BCTX.fillText('Você está nas últimas casas da jornada ✨', cardX+14, cardY+28);
-  }
-  BCTX.restore();
-}
-
-function drawAvatar(x,y,size,t){
-  const s=size*.5,bob=Math.sin(t/600)*2;
-  BCTX.save();BCTX.translate(x,y+bob);
-  // Sombra chão
-  BCTX.save();BCTX.scale(1,.24);BCTX.beginPath();BCTX.arc(0,s*6.2,s*.9,0,Math.PI*2);BCTX.fillStyle='rgba(0,0,0,.22)';BCTX.fill();BCTX.restore();
-  // Halo pulsante
-  const pulse=(Math.sin(t/450)+1)/2;
-  BCTX.beginPath();BCTX.arc(0,0,s+5,0,Math.PI*2);
-  BCTX.strokeStyle=`rgba(224,64,122,${.25+pulse*.5})`;BCTX.lineWidth=2;BCTX.stroke();
-  // Corpo/medalhão
-  const bg=BCTX.createRadialGradient(-s*.2,-s*.3,0,0,0,s);
-  bg.addColorStop(0,'#ff9bc4');bg.addColorStop(.55,'#d85090');bg.addColorStop(1,'#6a1030');
-  BCTX.beginPath();BCTX.arc(0,0,s,0,Math.PI*2);BCTX.fillStyle=bg;BCTX.fill();
-  BCTX.strokeStyle='rgba(200,146,42,.95)';BCTX.lineWidth=2.5;BCTX.stroke();
-  // Cabelo / rosto simples
-  BCTX.beginPath();BCTX.arc(0,-s*.12,s*.58,0,Math.PI*2);BCTX.fillStyle='#2f0f19';BCTX.fill();
-  BCTX.beginPath();BCTX.arc(0,-s*.06,s*.48,0,Math.PI*2);BCTX.fillStyle='#d79874';BCTX.fill();
-  // olhos
-  [[-s*.18,-s*.08],[s*.18,-s*.08]].forEach(([ox,oy])=>{
-    BCTX.beginPath();BCTX.ellipse(ox,oy,s*.095,s*.11,0,0,Math.PI*2);BCTX.fillStyle='#0d0505';BCTX.fill();
-    BCTX.beginPath();BCTX.arc(ox+s*.03,oy-s*.03,s*.03,0,Math.PI*2);BCTX.fillStyle='white';BCTX.fill();
-  });
-  BCTX.beginPath();BCTX.arc(0,s*.05,s*.18,.3,Math.PI-.3);BCTX.strokeStyle='#8a3020';BCTX.lineWidth=s*.06;BCTX.lineCap='round';BCTX.stroke();
-  BCTX.font=`${s*.75}px serif`;BCTX.textAlign='center';BCTX.textBaseline='middle';
-  BCTX.fillText('👑',0,-s*1.12);
-  BCTX.restore();
-}
-
-function initBoardCanvas() {
-  BC=el('board-canvas');BCTX=BC.getContext('2d');
-  BOARD_W=Math.max(320,(BC.parentElement.clientWidth||390)-20);
-  const total=Math.max(50, WALLET.total_houses||700);
-  const current=Math.max(1, WALLET.current_house||1);
-  const{positions,totalH}=buildSpiralViewport(total,current,BOARD_W);
-  CELL_POSITIONS=positions;BOARD_H=totalH;
-  BC.width=BOARD_W;BC.height=BOARD_H;BC.style.height=BOARD_H+'px';
-  cancelAnimationFrame(BOARD_RAF);
-  const loop=()=>{
-    const{positions:newPos,totalH:newH}=buildSpiralViewport(Math.max(50,WALLET.total_houses||700), Math.max(1, Math.round(ANIM_POS)||1), BOARD_W);
-    CELL_POSITIONS=newPos;
-    if(newH!==BOARD_H){BOARD_H=newH;BC.height=BOARD_H;BC.style.height=BOARD_H+'px';}
-    drawBoardFrame();
-    BOARD_RAF=requestAnimationFrame(loop);
-  };
-  loop();
-}
-
-function animMove(from,to,done){
-  ANIM_POS=from||0;
-  const step=()=>{
-    ANIM_POS+=0.055;
-    if(ANIM_POS<to)setTimeout(step,16);
-    else{ANIM_POS=to;if(done)done();}
-  };
-  step();
+    const type=cell?.cell_type||'comum';
+    const isSpecial=type!=='comum';
+    const cls=[num<current?'past':num>current?'future':'current', isSpecial?'special':''].join(' ');
+    return `<div class="bcell ${cls}" style="order:${visualSlot}" title="Casa ${num}${cell?.label?' — '+cell.label:''}">
+      ${num===current?'<div class="bavatar">😊</div>':''}
+      <div class="bcell-ic">${CELL_ICONS[type]||'⭐'}</div>
+      <div class="bcell-num">${num}</div>
+    </div>`;
+  }).join('');
+  root.innerHTML = `
+    <div class="board-crown-title">Mundo Scarlat<span>Jornada das Conquistas</span></div>
+    <div class="board-progress-card">
+      <div>
+        <div class="board-progress-main">Casa atual <b>${current}</b> de ${total}</div>
+        <div class="board-progress-sub">${nextSpecial?`Faltam ${nextSpecial.cell_number-current} casas para ${nextSpecial.label||'o próximo marco'}`:'Reta final da temporada ✨'}</div>
+      </div>
+      <div class="board-progress-percent">${pct}%</div>
+    </div>
+    <div class="board-track">
+      <div class="board-road" style="left:9%;right:9%;top:calc(20% + 4px)"></div>
+      <div class="board-road" style="left:9%;right:9%;top:calc(40% + 2px)"></div>
+      <div class="board-road" style="left:9%;right:9%;top:calc(60% + 1px)"></div>
+      <div class="board-road" style="left:9%;right:9%;top:calc(80% - 1px)"></div>
+      ${cellHtml}
+    </div>
+    <div class="board-next-box">
+      <div class="board-next-ic">${nextSpecial?CELL_ICONS[nextSpecial.cell_type]||'🎁':'👑'}</div>
+      <div class="board-next-txt">
+        <b>${nextSpecial?`Próximo marco: Casa ${nextSpecial.cell_number}`:'Última etapa'}</b>
+        ${nextSpecial?(nextSpecial.label||'Continue avançando na jornada.'):'Você está chegando ao grande final da temporada.'}
+        ${prevSpecial?`<br><span style="color:rgba(255,255,255,.45)">Último marco: casa ${prevSpecial.cell_number}</span>`:''}
+      </div>
+    </div>`;
 }
 
 function renderBoardPage() {
-  el('board-season-name').textContent=WALLET.season_name||'Temporada Diamante';
+  el('board-season-name').textContent=WALLET.season_name||'Temporada Diamante 2025';
   el('board-cur-house').textContent=WALLET.current_house||0;
   el('board-rolls').textContent=WALLET.available_rolls||0;
   el('board-rolls-txt').textContent=WALLET.available_rolls||0;
   const btn=el('board-btn-play');
-  btn.disabled=(WALLET.available_rolls||0)<=0;
-  ANIM_POS=WALLET.current_house||0;
+  if(btn) btn.disabled=(WALLET.available_rolls||0)<=0;
+  ANIM_POS=WALLET.current_house||PROF?.current_house||0;
   ANIM_TARGET=ANIM_POS;
-  initBoardCanvas();
+  renderBoardDom();
+}
+
+function animMove(from,to,done){
+  ANIM_POS=from||0;
+  const dir = to>=ANIM_POS ? 1 : -1;
+  const step=()=>{
+    ANIM_POS += dir;
+    if((dir>0 && ANIM_POS>to) || (dir<0 && ANIM_POS<to)) ANIM_POS=to;
+    renderBoardDom();
+    if(ANIM_POS!==to) setTimeout(step,180);
+    else if(done) done();
+  };
+  if(ANIM_POS===to){renderBoardDom(); if(done)done(); return;}
+  setTimeout(step,120);
 }
 
 /* ════════════════════════════════════════════
