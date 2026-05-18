@@ -219,7 +219,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
 .board-rolls-pill{display:flex;align-items:center;gap:5px;background:rgba(224,64,122,.12);border:1px solid rgba(224,64,122,.3);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:800;color:var(--blush)}
 .board-wrap{margin:0 14px 14px;background:var(--g1);border:1px solid var(--b1);border-radius:var(--r3);overflow:hidden;position:relative}
 .board-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(155,25,66,.06),transparent);pointer-events:none}
-#board-canvas{display:block;width:100%}
+#board-canvas{display:block;width:100%;background:radial-gradient(ellipse 90% 30% at 50% 0%,rgba(224,64,122,.08),transparent 60%)}
+.board-tools{display:flex;gap:8px;margin:0 14px 12px}
+.board-mini-btn{flex:1;border:1px solid rgba(200,146,42,.25);background:rgba(200,146,42,.08);color:var(--gold3);border-radius:14px;padding:10px 8px;font:800 11px Nunito,sans-serif;cursor:pointer}
+.board-mini-btn:hover{background:rgba(200,146,42,.14)}
 .board-play-btn{margin:0 14px 14px;width:calc(100% - 28px);padding:18px;border:none;border-radius:var(--r2);cursor:pointer;background:linear-gradient(135deg,var(--rose2),var(--rose),var(--ruby2));color:#fff;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;box-shadow:var(--srose);transition:all .25s;position:relative;overflow:hidden}
 .board-play-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.25),transparent 55%);border-radius:inherit}
 .board-play-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -529,8 +532,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--t1);min-he
       <div class="board-rolls-pill">🎲 <span id="board-rolls">0</span></div>
     </div>
   </div>
-  <div class="board-wrap">
+  <div class="board-wrap" id="board-wrap">
     <canvas id="board-canvas"></canvas>
+  </div>
+  <div class="board-tools">
+    <button class="board-mini-btn" onclick="scrollToCurrentHouse()">🎯 Minha casa</button>
+    <button class="board-mini-btn" onclick="scrollToFinalHouse()">👑 Final</button>
   </div>
   <button class="board-play-btn" id="board-btn-play" onclick="doRollDice()">
     🎲 Jogar Dado — <span id="board-rolls-txt">0</span> jogadas
@@ -1066,27 +1073,20 @@ function renderPrizesPage() {
    TABULEIRO CANVAS — Serpentina
 ════════════════════════════════════════════ */
 function buildSerpentine(total, w) {
-  // Em tabuleiro de 700 casas, não desenhamos 700 quadradinhos.
-  // Desenhamos uma jornada premium: início, casa atual, vizinhança, marcos especiais e final.
-  const current = Math.max(0, Math.min(total, Math.round(WALLET.current_house || PROF?.current_house || 0)));
-  const specialNums = (BOARD_CELLS || []).map(c => Number(c.cell_number)).filter(n => n > 0 && n <= total);
-  const nums = new Set([1, total, current || 1]);
-
-  // Janela local: dá sensação de caminho real sem virar uma parede infinita de casas.
-  for (let n = Math.max(1, current - 10); n <= Math.min(total, current + 18); n++) nums.add(n);
-  specialNums.forEach(n => nums.add(n));
-
-  const displayNums = Array.from(nums).filter(Boolean).sort((a,b)=>a-b);
-  const pad = 18;
-  const topPad = 82;
-  const cols = 4;
+  // Tabuleiro gigante de verdade: desenha TODAS as casas, de 1 até total.
+  // Para 700 casas, vira um mapa vertical grande e rolável, não apenas marcos.
+  total = Math.max(1, Math.min(Number(total)||700, 1000));
+  const pad = 14;
+  const topPad = 92;
+  const cols = w < 380 ? 5 : 5;
   const cellW = (w - pad*2) / cols;
-  const cellH = Math.max(66, cellW * .82);
-  const rows = Math.ceil(displayNums.length / cols);
-  const totalH = topPad + rows * cellH + 38;
+  const cellH = Math.max(54, Math.min(64, cellW * .78));
+  const rows = Math.ceil(total / cols);
+  const totalH = topPad + rows * cellH + 70;
   const positions = [];
 
-  displayNums.forEach((num, idx) => {
+  for (let num = 1; num <= total; num++) {
+    const idx = num - 1;
     const row = Math.floor(idx / cols);
     const colInRow = idx % cols;
     const fromLeft = row % 2 === 0;
@@ -1095,11 +1095,13 @@ function buildSerpentine(total, w) {
       num,
       x: pad + col * cellW + cellW / 2,
       y: topPad + row * cellH + cellH / 2,
-      w: cellW - 9,
-      h: cellH - 11,
+      w: cellW - 7,
+      h: cellH - 8,
+      row,
+      col,
       displayIndex: idx
     });
-  });
+  }
   return { positions, totalH };
 }
 function rRect(ctx,x,y,w,h,r){
@@ -1111,86 +1113,112 @@ function rRect(ctx,x,y,w,h,r){
 
 function drawBoardFrame() {
   if(!BC||!BCTX||!WALLET.total_houses) return;
-  const cur = WALLET.current_house || PROF?.current_house || 0;
+  const cur = Math.max(0, Math.min(WALLET.total_houses||700, WALLET.current_house || PROF?.current_house || 0));
   const anim = Math.round(ANIM_POS)||cur;
   const t = Date.now();
   BCTX.clearRect(0,0,BOARD_W,BOARD_H);
 
-  // Barra de progresso geral da temporada
-  const progress = Math.max(0, Math.min(1, cur / (WALLET.total_houses || 1)));
+  // Fundo do mapa
+  const bg=BCTX.createLinearGradient(0,0,0,BOARD_H);
+  bg.addColorStop(0,'rgba(74,8,100,.24)');
+  bg.addColorStop(.25,'rgba(30,8,53,.13)');
+  bg.addColorStop(1,'rgba(10,1,20,.38)');
+  BCTX.fillStyle=bg;BCTX.fillRect(0,0,BOARD_W,BOARD_H);
+
+  // Cabeçalho fixo dentro do canvas
+  const total = WALLET.total_houses || 700;
+  const progress = Math.max(0, Math.min(1, cur / total));
   BCTX.save();
-  BCTX.fillStyle='rgba(0,0,0,.28)';
-  rRect(BCTX,18,42,BOARD_W-36,16,8);BCTX.fill();
-  const pg=BCTX.createLinearGradient(18,42,BOARD_W-18,42);pg.addColorStop(0,'#e0407a');pg.addColorStop(.55,'#e8b84a');pg.addColorStop(1,'#fff8e8');
-  BCTX.fillStyle=pg;rRect(BCTX,18,42,(BOARD_W-36)*progress,16,8);BCTX.fill();
-  BCTX.font='800 11px Nunito,sans-serif';BCTX.fillStyle='rgba(255,240,248,.78)';BCTX.textAlign='right';BCTX.fillText(`Casa ${cur} de ${WALLET.total_houses||0}`,BOARD_W-18,34);
+  BCTX.font='700 22px Cormorant Garamond,serif';
+  BCTX.textAlign='left';BCTX.fillStyle='#ffd980';
+  BCTX.fillText('Jornada Scarlat',18,32);
+  BCTX.font='800 11px Nunito,sans-serif';BCTX.fillStyle='rgba(255,240,248,.72)';
+  BCTX.textAlign='right';BCTX.fillText(`Casa ${cur} de ${total}`,BOARD_W-18,32);
+  BCTX.fillStyle='rgba(0,0,0,.32)';rRect(BCTX,18,48,BOARD_W-36,16,8);BCTX.fill();
+  const pg=BCTX.createLinearGradient(18,48,BOARD_W-18,48);pg.addColorStop(0,'#e0407a');pg.addColorStop(.55,'#e8b84a');pg.addColorStop(1,'#fff8e8');
+  BCTX.fillStyle=pg;rRect(BCTX,18,48,(BOARD_W-36)*progress,16,8);BCTX.fill();
   BCTX.restore();
 
-  // Trilha conectando casas
+  // Trilha conectando todas as casas
   if(CELL_POSITIONS.length>1){
     BCTX.save();
-    BCTX.setLineDash([6,9]);BCTX.lineWidth=3;BCTX.strokeStyle='rgba(200,146,42,.22)';BCTX.lineCap='round';
+    BCTX.setLineDash([5,9]);BCTX.lineWidth=2.6;BCTX.strokeStyle='rgba(200,146,42,.20)';BCTX.lineCap='round';BCTX.lineJoin='round';
     BCTX.beginPath();BCTX.moveTo(CELL_POSITIONS[0].x,CELL_POSITIONS[0].y);
     CELL_POSITIONS.forEach(p=>BCTX.lineTo(p.x,p.y));
     BCTX.stroke();BCTX.setLineDash([]);BCTX.restore();
   }
 
+  const specialMap = new Map((BOARD_CELLS||[]).map(c=>[Number(c.cell_number),c]));
+
   CELL_POSITIONS.forEach(pos=>{
     const num=pos.num;
-    const cell=BOARD_CELLS.find(c=>c.cell_number===num);
+    const cell=specialMap.get(num);
     const isSpecial=cell&&cell.cell_type!=='comum';
     const isCur=num===anim || num===cur;
     const isPast=num<cur;
-    const hw=pos.w/2,hh=pos.h/2,rad=pos.w*.16;
+    const isCheckpoint = num % 50 === 0 && !isSpecial;
+    const hw=pos.w/2,hh=pos.h/2,rad=15;
 
     BCTX.save();BCTX.translate(pos.x,pos.y);
-    BCTX.shadowColor=isCur?'rgba(224,64,122,.7)':isSpecial?'rgba(200,146,42,.3)':'rgba(0,0,0,.4)';
-    BCTX.shadowBlur=isCur?18:isSpecial?10:4;
 
+    // Sombra e brilho
+    BCTX.shadowColor=isCur?'rgba(224,64,122,.88)':isSpecial?'rgba(200,146,42,.48)':isPast?'rgba(200,146,42,.20)':'rgba(0,0,0,.35)';
+    BCTX.shadowBlur=isCur?22:isSpecial?13:isPast?5:2;
+
+    // Preenchimento
     rRect(BCTX,-hw,-hh,pos.w,pos.h,rad);
     let fill;
-    if(isCur)         fill='rgba(196,32,88,0.6)';
-    else if(isSpecial)fill='rgba(200,146,42,0.14)';
-    else if(isPast)   fill='rgba(200,146,42,0.06)';
-    else              fill='rgba(255,255,255,0.04)';
+    if(isCur) fill='rgba(196,32,88,.72)';
+    else if(isSpecial) fill='rgba(200,146,42,.16)';
+    else if(isCheckpoint) fill='rgba(200,146,42,.08)';
+    else if(isPast) fill='rgba(200,146,42,.045)';
+    else fill='rgba(255,255,255,.035)';
     BCTX.fillStyle=fill;BCTX.fill();BCTX.shadowBlur=0;
 
+    // Borda
     rRect(BCTX,-hw,-hh,pos.w,pos.h,rad);
-    BCTX.strokeStyle=isCur?'rgba(240,112,160,.95)':isSpecial?'rgba(200,146,42,.4)':'rgba(255,255,255,.07)';
-    BCTX.lineWidth=isCur?2.5:1.5;BCTX.stroke();
+    BCTX.strokeStyle=isCur?'rgba(255,160,200,.98)':isSpecial?'rgba(255,217,128,.55)':isCheckpoint?'rgba(200,146,42,.30)':'rgba(255,255,255,.07)';
+    BCTX.lineWidth=isCur?3:isSpecial?2:1.2;BCTX.stroke();
 
-    // Pulsar borda atual
+    // Efeito da casa atual
     if(isCur){
-      const p=(Math.sin(t/350)+1)/2;
-      rRect(BCTX,-hw-3,-hh-3,pos.w+6,pos.h+6,rad+2);
-      BCTX.strokeStyle=`rgba(240,112,160,${.2+p*.4})`;BCTX.lineWidth=1;BCTX.stroke();
+      const p=(Math.sin(t/330)+1)/2;
+      rRect(BCTX,-hw-4,-hh-4,pos.w+8,pos.h+8,rad+3);
+      BCTX.strokeStyle=`rgba(255,160,200,${.24+p*.46})`;BCTX.lineWidth=1.5;BCTX.stroke();
     }
 
-    // Ícone da casa especial
-    if(isSpecial&&!isCur){
-      BCTX.font=`${pos.w*.36}px serif`;BCTX.textAlign='center';BCTX.textBaseline='middle';
-      BCTX.fillText(CELL_ICONS[cell.cell_type]||'⭐',0,-pos.h*.08);
+    // Ícones especiais
+    if(isSpecial){
+      BCTX.font=`${Math.min(20,pos.w*.33)}px serif`;BCTX.textAlign='center';BCTX.textBaseline='middle';
+      BCTX.globalAlpha=isCur?.55:.92;
+      BCTX.fillText(CELL_ICONS[cell.cell_type]||'⭐',0,-hh*.28);
+      BCTX.globalAlpha=1;
     }
 
-    // Número
-    BCTX.font=`800 ${pos.w*.21}px Nunito,sans-serif`;BCTX.textAlign='center';BCTX.textBaseline='middle';
-    BCTX.fillStyle=isCur?'#fff':isSpecial?'rgba(255,217,128,.85)':'rgba(255,255,255,.25)';
-    BCTX.fillText(num,0,isSpecial&&!isCur?pos.h*.3:0);
+    // Número de TODAS as casas
+    const fontSize = isSpecial ? Math.min(18,pos.w*.30) : Math.min(15,pos.w*.25);
+    BCTX.font=`900 ${fontSize}px Nunito,sans-serif`;BCTX.textAlign='center';BCTX.textBaseline='middle';
+    BCTX.fillStyle=isCur?'#fff':isSpecial?'#ffd980':isPast?'rgba(255,217,128,.62)':'rgba(255,240,248,.32)';
+    BCTX.fillText(num,0,isSpecial?hh*.26:0);
+
+    // Micro label em marcos especiais
+    if(isSpecial && pos.w > 55){
+      BCTX.font='800 7.5px Nunito,sans-serif';BCTX.fillStyle='rgba(255,240,248,.48)';
+      const label=(cell.label||'').replace(/[🎡🎁🏆👑🚚🎟️💵🛍️🛵📱✈️]/g,'').trim().slice(0,13);
+      if(label) BCTX.fillText(label,0,hh*.46);
+    }
 
     BCTX.restore();
   });
 
-  // Avatar da jogadora — procura a casa atual na jornada desenhada
+  // Avatar da jogadora
   const houseIdx=(ANIM_POS>0?Math.round(ANIM_POS):cur);
   if(houseIdx>0&&CELL_POSITIONS.length>0){
     let p=CELL_POSITIONS.find(pp=>pp.num===houseIdx);
-    if(!p){
-      p=[...CELL_POSITIONS].reverse().find(pp=>pp.num<=houseIdx) || CELL_POSITIONS[0];
-    }
-    if(p)drawAvatar(p.x,p.y-p.h*.5-14,Math.min(p.w*.78,46),t);
+    if(!p)p=[...CELL_POSITIONS].reverse().find(pp=>pp.num<=houseIdx) || CELL_POSITIONS[0];
+    if(p)drawAvatar(p.x,p.y-p.h*.54-13,Math.min(p.w*.82,42),t);
   }
 }
-
 function drawAvatar(x,y,size,t){
   const s=size*.5,bob=Math.sin(t/600)*2;
   BCTX.save();BCTX.translate(x,y+bob);
@@ -1224,7 +1252,7 @@ function drawAvatar(x,y,size,t){
 function initBoardCanvas() {
   BC=el('board-canvas');BCTX=BC.getContext('2d');
   BOARD_W=BC.parentElement.clientWidth||390;
-  const total=WALLET.total_houses||50;
+  const total=WALLET.total_houses||700;
   const{positions,totalH}=buildSerpentine(total,BOARD_W);
   CELL_POSITIONS=positions;BOARD_H=totalH;
   BC.width=BOARD_W;BC.height=BOARD_H;BC.style.height=BOARD_H+'px';
@@ -1253,7 +1281,18 @@ function renderBoardPage() {
   ANIM_POS=WALLET.current_house||0;
   ANIM_TARGET=ANIM_POS;
   initBoardCanvas();
+  setTimeout(scrollToCurrentHouse,120);
 }
+
+function scrollToHouse(num){
+  const pos = CELL_POSITIONS.find(p=>p.num===Number(num));
+  const canvas = el('board-canvas');
+  if(!pos || !canvas) return;
+  const top = canvas.getBoundingClientRect().top + window.scrollY + pos.y - window.innerHeight*0.42;
+  window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+}
+function scrollToCurrentHouse(){ scrollToHouse(WALLET.current_house || PROF?.current_house || 1); }
+function scrollToFinalHouse(){ scrollToHouse(WALLET.total_houses || 700); }
 
 /* ════════════════════════════════════════════
    JOGAR DADO
@@ -1576,10 +1615,10 @@ async function renderHistory(){
     :'<div class="empty"><span class="ei">🎲</span><p>Nenhuma jogada ainda.</p></div>';
 
   // Prêmios
-  const{data:claims}=await db.from('prize_claims').select('*,house_prizes(name,icon)').eq('client_id',USER.id).order('claimed_at',{ascending:false}).limit(20);
+  const{data:claims}=await db.from('prize_claims').select('*,house_prizes(name,icon,category),reward_catalog(name,icon,category)').eq('client_id',USER.id).order('claimed_at',{ascending:false}).limit(20);
   const pr=el('hist-prizes');
   pr.innerHTML=claims?.length?claims.map(c=>{
-    const reward=SEASON_REWARDS.find(r=>r.id===c.house_prize_id);
+    const reward=SEASON_REWARDS.find(r=>r.id===c.reward_id)||SEASON_REWARDS.find(r=>r.id===c.house_prize_id)||c.reward_catalog||c.house_prizes;
     const badge=c.delivered
       ?'<span style="font-size:10px;background:rgba(200,146,42,.1);color:var(--gold2);padding:2px 8px;border-radius:6px;font-weight:800">✅ Entregue</span>'
       :'<span style="font-size:10px;background:rgba(224,64,122,.1);color:var(--blush);padding:2px 8px;border-radius:6px;font-weight:800">⏳ Pendente</span>';
